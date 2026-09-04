@@ -1,0 +1,8 @@
+{
+  "name": "bitacora-de-un-observador",
+  "version": "1.0.0",
+  "private": true,
+  "description": "El archivo de Fabio Iván Castañeda Fuentes: qué somos los humanos y qué es el universo, en palabras humanas.",
+  "scripts": { "build": "node build/build.mjs" },
+  "engines": { "node": ">=18" }
+}

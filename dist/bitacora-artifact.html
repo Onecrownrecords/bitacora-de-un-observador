@@ -1,0 +1,2309 @@
+<title>Bitácora de un Observador</title>
+<meta name="description" content="El archivo de Fabio Iván Castañeda Fuentes: qué somos los humanos, qué es el universo y cómo desarmar la Matrix, en palabras humanas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* =====================================================================
+   Bitácora de un Observador — hoja de estilos
+   Registro: editorial-maximalista, tema oscuro comprometido.
+   Ver DESIGN.md para las primitivas.
+   ===================================================================== */
+
+:root {
+  /* color por rol */
+  --bg: #0b0d12;
+  --bg-2: #11141b;
+  --bg-3: #171b24;
+  --bg-4: #1f2430;
+  --ink: #e9e4d8;
+  --ink-2: #aca89b;
+  --ink-3: #736f66;
+  --line: rgba(233, 228, 216, 0.12);
+  --line-strong: rgba(233, 228, 216, 0.28);
+  --cold: #5ec1d9;
+  --cold-dim: rgba(94, 193, 217, 0.14);
+  --warm: #e2a85a;
+  --warm-dim: rgba(226, 168, 90, 0.14);
+  --alert: #d97a6c;
+  --alert-dim: rgba(217, 122, 108, 0.14);
+
+  /* tipografía */
+  --f-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  --t-1: 0.875rem;
+  --t0: 1rem;
+  --t1: 1.25rem;
+  --t2: 1.5625rem;
+  --t3: 1.953rem;
+  --t4: 2.441rem;
+  --t5: 3.052rem;
+  --t6: 3.815rem;
+  --t7: 4.768rem;
+
+  /* espacio */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --s7: 48px; --s8: 64px; --s9: 96px; --s10: 128px;
+
+  /* movimiento */
+  --fast: 150ms;
+  --slow: 420ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --radius: 6px;
+  --rail-w: 264px;
+  --measure: 68ch;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--t0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+
+::selection { background: var(--warm); color: var(--bg); }
+
+a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--warm); }
+
+:focus-visible { outline: 2px solid var(--warm); outline-offset: 3px; }
+
+img, canvas, svg { max-width: 100%; display: block; }
+
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+h1, h2, h3, h4 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0; }
+
+/* ---------- utilidades ---------- */
+.mono { font-family: var(--f-mono); }
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.eyebrow.cold { color: var(--cold); }
+.eyebrow.warm { color: var(--warm); }
+.eyebrow.alert { color: var(--alert); }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.em { font-style: italic; font-family: var(--f-display); font-size: 1.12em; }
+
+/* ---------- grano de fondo ---------- */
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(1200px 600px at 15% -10%, rgba(94, 193, 217, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(226, 168, 90, 0.07), transparent 60%);
+}
+
+/* =====================================================================
+   Estructura: barra superior + rail de capítulos + contenido
+   ===================================================================== */
+.topbar {
+  position: sticky; top: 0; z-index: 30; height: 53px; white-space: nowrap;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+  padding: var(--s3) var(--s5);
+  background: rgba(11, 13, 18, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: var(--s3); min-width: 0; }
+.brand-mark {
+  width: 22px; height: 22px; flex: none; align-self: center;
+  border: 1px solid var(--warm); border-radius: 50%; position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--warm);
+  animation: pupil 6s ease-in-out infinite;
+}
+@keyframes pupil { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.55); } }
+.brand-name { font-family: var(--f-display); font-size: var(--t1); white-space: nowrap; }
+.brand-author { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.08em; }
+.topbar-status { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.08em; }
+.topbar-status b { color: var(--warm); font-weight: 500; }
+
+.shell { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr; }
+
+/* rail de capítulos */
+.rail {
+  position: sticky; top: 53px; z-index: 20;
+  background: rgba(11, 13, 18, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto; scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+.rail-list { list-style: none; margin: 0; padding: var(--s2) var(--s4); display: flex; gap: var(--s1); }
+.rail-btn {
+  display: flex; align-items: baseline; gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  border-radius: var(--radius);
+  color: var(--ink-2); white-space: nowrap;
+  transition: color var(--fast) var(--ease), background var(--fast) var(--ease);
+  border: 1px solid transparent;
+}
+.rail-btn:hover { color: var(--ink); background: var(--bg-3); }
+.rail-btn[aria-current="page"] { color: var(--ink); background: var(--bg-3); border-color: var(--line); }
+.rail-btn .n { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.08em; }
+.rail-btn[aria-current="page"] .n { color: var(--warm); }
+.rail-btn[data-world="matrix"][aria-current="page"] .n { color: var(--cold); }
+.rail-btn .t { font-size: var(--t-1); }
+.rail-foot { display: none; }
+
+.content { min-width: 0; overflow-x: clip; }
+body { overflow-x: clip; }
+
+@media (min-width: 1040px) {
+  .shell { grid-template-columns: var(--rail-w) 1fr; }
+  .rail {
+    top: 53px; height: calc(100vh - 53px);
+    border-bottom: 0; border-right: 1px solid var(--line);
+    overflow-y: auto; background: transparent; backdrop-filter: none;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .rail-list { flex-direction: column; padding: var(--s6) var(--s4); gap: 2px; }
+  .rail-btn { padding: var(--s2) var(--s3); white-space: normal; }
+  .rail-btn .n { width: 2.4em; flex: none; }
+  .rail-foot {
+    display: block; padding: var(--s5) var(--s5) var(--s6);
+    font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); line-height: 1.7;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* =====================================================================
+   Capítulos (tabs)
+   ===================================================================== */
+.chapter { display: none; }
+.chapter.is-active { display: block; animation: rise var(--slow) var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.chapter-head {
+  position: relative; overflow: hidden;
+  padding: var(--s8) var(--s5) var(--s6);
+  border-bottom: 1px solid var(--line);
+}
+.chapter-head .eyebrow { margin-bottom: var(--s4); }
+.chapter-title { font-size: clamp(var(--t5), 7vw, var(--t7)); max-width: 14ch; }
+.chapter-title em { color: var(--warm); font-style: italic; }
+.chapter[data-world="matrix"] .chapter-title em { color: var(--cold); }
+.chapter-lede {
+  margin-top: var(--s5); max-width: 56ch;
+  font-size: var(--t1); line-height: 1.5; color: var(--ink-2);
+}
+.chapter-index {
+  position: absolute; right: var(--s5); top: var(--s5);
+  font-family: var(--f-display); font-size: clamp(6rem, 18vw, 14rem);
+  line-height: 0.8; color: transparent;
+  -webkit-text-stroke: 1px var(--line);
+  pointer-events: none; user-select: none;
+}
+
+/* artefacto: canvas 3D o interactivo por capítulo */
+.artefact {
+  position: relative; margin: 0; padding: 0;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  min-height: 300px; height: clamp(300px, 48vh, 520px);
+}
+.artefact canvas { width: 100%; height: 100%; }
+.artefact-caption {
+  position: absolute; left: var(--s5); bottom: var(--s5); right: var(--s5);
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s3);
+  font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em;
+  color: var(--ink-3); pointer-events: none;
+}
+.artefact-caption b { color: var(--ink-2); font-weight: 500; }
+.artefact-controls {
+  position: absolute; right: var(--s5); top: var(--s5);
+  display: flex; gap: var(--s2); pointer-events: auto;
+}
+.artefact-controls .btn { background: rgba(11, 13, 18, 0.7); }
+.artefact.is-static::after {
+  content: "movimiento reducido · escena estática";
+  position: absolute; top: var(--s3); left: var(--s5);
+  font-family: var(--f-mono); font-size: 0.65rem; color: var(--ink-3);
+}
+
+/* cuerpo del capítulo */
+.chapter-body {
+  padding: var(--s7) var(--s5) var(--s9);
+  display: grid; gap: var(--s7);
+}
+@media (min-width: 720px) {
+  .chapter-head { padding: var(--s9) var(--s8) var(--s7); }
+  .chapter-body { padding: var(--s8) var(--s8) var(--s10); }
+  .artefact-caption { left: var(--s8); right: var(--s8); }
+  .artefact-controls { right: var(--s8); }
+  .chapter-index { right: var(--s8); }
+}
+
+.block { max-width: var(--measure); }
+.block > * + * { margin-top: var(--s4); }
+.block h2 { font-size: var(--t4); margin-top: 0; }
+.block h3 { font-size: var(--t2); color: var(--ink); }
+.block h2 + p, .block h3 + p { margin-top: var(--s3); }
+.block p { color: var(--ink-2); }
+.block p strong { color: var(--ink); font-weight: 500; }
+.block ul, .block ol { color: var(--ink-2); padding-left: 1.2em; }
+.block li + li { margin-top: var(--s2); }
+.block li::marker { color: var(--ink-3); }
+.block .lead { font-size: var(--t1); color: var(--ink); line-height: 1.5; }
+
+.callout {
+  border-left: 2px solid var(--warm);
+  padding: var(--s2) 0 var(--s2) var(--s5);
+  font-family: var(--f-display); font-size: var(--t2); line-height: 1.25; color: var(--ink);
+}
+.callout.cold { border-color: var(--cold); }
+.callout.alert { border-color: var(--alert); }
+.callout small {
+  display: block; margin-top: var(--s3);
+  font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.06em;
+}
+
+.wide { max-width: 1100px; }
+
+/* separador con etiqueta */
+.rule { display: flex; align-items: center; gap: var(--s4); max-width: 1100px; }
+.rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* botones */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--s2);
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--line-strong); border-radius: var(--radius);
+  font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink);
+  transition: border-color var(--fast) var(--ease), background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.btn:hover { border-color: var(--warm); background: var(--warm-dim); }
+.btn.is-on { background: var(--warm); color: var(--bg); border-color: var(--warm); }
+.btn.cold:hover { border-color: var(--cold); background: var(--cold-dim); }
+.btn.cold.is-on { background: var(--cold); border-color: var(--cold); color: var(--bg); }
+.btn[disabled] { opacity: 0.4; cursor: default; }
+
+/* =====================================================================
+   Componentes de contenido
+   ===================================================================== */
+
+/* tabla dos mundos (matrix vs real) */
+.two-worlds {
+  display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+}
+@media (min-width: 720px) { .two-worlds { grid-template-columns: 1fr 1fr; } }
+.world { background: var(--bg-2); padding: var(--s5); }
+.world h3 { font-size: var(--t2); margin: var(--s2) 0 var(--s4); }
+.world ul { list-style: none; padding: 0; margin: 0; color: var(--ink-2); }
+.world li { padding: var(--s2) 0; border-top: 1px solid var(--line); font-size: var(--t-1); }
+.world li:first-child { border-top: 0; }
+.world.cold h3 { color: var(--cold); } .world.warm h3 { color: var(--warm); }
+
+/* píldoras */
+.pills { display: grid; grid-template-columns: 1fr; gap: var(--s4); }
+@media (min-width: 640px) { .pills { grid-template-columns: 1fr 1fr; } }
+.pill-btn {
+  text-align: left; padding: var(--s5);
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2);
+  transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.pill-btn:hover { transform: translateY(-2px); }
+.pill-btn.blue:hover, .pill-btn.blue[aria-pressed="true"] { border-color: var(--cold); }
+.pill-btn.red:hover, .pill-btn.red[aria-pressed="true"] { border-color: var(--alert); }
+.pill-btn .cap {
+  display: inline-block; width: 44px; height: 18px; border-radius: 9px; margin-bottom: var(--s3);
+}
+.pill-btn.blue .cap { background: linear-gradient(90deg, var(--cold), #2a7a8c); }
+.pill-btn.red .cap { background: linear-gradient(90deg, var(--alert), #8a3a30); }
+.pill-btn h3 { font-size: var(--t2); }
+.pill-btn p { margin-top: var(--s2); color: var(--ink-2); font-size: var(--t-1); }
+.pill-out {
+  margin-top: var(--s4); padding: var(--s5);
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2);
+  min-height: 120px; color: var(--ink-2);
+}
+.pill-out .eyebrow { margin-bottom: var(--s3); }
+.pill-out p + p { margin-top: var(--s3); }
+
+/* línea de tiempo vertical (tres matrices) */
+.timeline { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+.timeline li { position: relative; padding: 0 0 var(--s6) var(--s6); }
+.timeline li::before {
+  content: ""; position: absolute; left: -5px; top: 8px; width: 9px; height: 9px;
+  border-radius: 50%; background: var(--bg); border: 1px solid var(--cold);
+}
+.timeline li.warm::before { border-color: var(--warm); background: var(--warm); }
+.timeline .when { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.08em; }
+.timeline h3 { font-size: var(--t2); margin: var(--s1) 0 var(--s2); }
+.timeline p { color: var(--ink-2); max-width: 60ch; }
+
+/* línea de tiempo horizontal (evolución) */
+.evo { display: flex; gap: var(--s4); overflow-x: auto; padding-bottom: var(--s4); scroll-snap-type: x mandatory; }
+.evo::-webkit-scrollbar { height: 6px; }
+.evo::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 3px; }
+.evo-card {
+  flex: 0 0 260px; scroll-snap-align: start;
+  padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2);
+  display: flex; flex-direction: column; gap: var(--s2);
+}
+.evo-card .when { font-family: var(--f-mono); font-size: 0.72rem; color: var(--warm); letter-spacing: 0.08em; }
+.evo-card h3 { font-size: var(--t1); }
+.evo-card p { color: var(--ink-2); font-size: var(--t-1); }
+.evo-card.now { border-color: var(--warm); }
+
+/* mapa del cerebro */
+.brain { display: grid; grid-template-columns: 1fr; gap: var(--s5); align-items: start; }
+@media (min-width: 800px) { .brain { grid-template-columns: 1.2fr 1fr; } }
+.brain-svg { width: 100%; height: auto; }
+.brain-svg .region { fill: var(--bg-3); stroke: var(--line-strong); stroke-width: 1; cursor: pointer; transition: fill var(--fast) var(--ease); }
+.brain-svg .region:hover, .brain-svg .region.is-on { fill: var(--warm-dim); stroke: var(--warm); }
+.brain-svg text { font-family: var(--f-mono); font-size: 11px; fill: var(--ink-3); pointer-events: none; letter-spacing: 0.06em; }
+.brain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.brain-list button {
+  width: 100%; text-align: left; padding: var(--s3) var(--s4);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  display: grid; gap: 2px;
+}
+.brain-list button.is-on { border-color: var(--warm); background: var(--warm-dim); }
+.brain-list .k { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.08em; }
+.brain-list .v { color: var(--ink); }
+.brain-detail {
+  padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2);
+  color: var(--ink-2); min-height: 160px;
+}
+.brain-detail h3 { font-size: var(--t2); margin-bottom: var(--s2); }
+
+/* administrador de tareas (RAM) */
+.ram { display: grid; gap: var(--s5); padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2); }
+.ram-rows { display: grid; gap: var(--s3); }
+.ram-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3); align-items: center; }
+.ram-row label { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-2); letter-spacing: 0.04em; }
+.ram-row input[type="range"] { grid-column: 1 / -1; }
+.ram-row .val { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.ram-bar { height: 18px; border-radius: 3px; background: var(--bg-4); overflow: hidden; display: flex; }
+.ram-bar .seg { height: 100%; transition: width var(--slow) var(--ease); }
+.ram-bar .seg.ego { background: var(--cold); opacity: 0.55; }
+.ram-bar .seg.free { background: var(--warm); }
+.ram-read { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-2); }
+.ram-read b { color: var(--warm); font-weight: 500; }
+.ram-msg { color: var(--ink-2); font-family: var(--f-display); font-size: var(--t1); line-height: 1.3; }
+
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: var(--line-strong); border-radius: 1px; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--warm); border: 2px solid var(--bg); cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--warm); border: 2px solid var(--bg); cursor: pointer; }
+input[type="range"]:focus-visible { outline: 2px solid var(--warm); outline-offset: 6px; }
+
+/* capas del sistema (hardware / software / antena) */
+.stack { display: grid; gap: var(--s3); }
+.layer {
+  display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: var(--s4); align-items: start;
+  padding: var(--s4) var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2);
+}
+@media (max-width: 560px) { .layer { grid-template-columns: 1fr; } }
+.layer .k { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding-top: 4px; }
+.layer h3 { font-size: var(--t1); font-family: var(--f-body); font-weight: 500; color: var(--ink); }
+.layer p { color: var(--ink-2); font-size: var(--t-1); margin-top: var(--s1); }
+.layer.hw { border-left: 2px solid var(--warm); }
+.layer.sw { border-left: 2px solid var(--cold); }
+.layer.ant { border-left: 2px solid var(--ink); }
+.stack-title { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin: var(--s4) 0 var(--s1); }
+
+/* reloj de ayuno */
+.fast { display: grid; gap: var(--s5); padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2); }
+.fast-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4); flex-wrap: wrap; }
+.fast-hours { font-family: var(--f-display); font-size: var(--t5); line-height: 1; }
+.fast-hours small { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-3); margin-left: var(--s2); }
+.fast-phases { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
+.fast-phase { padding: var(--s3) var(--s2); border-radius: 3px; background: var(--bg-4); font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--ink-3); text-align: center; transition: background var(--fast) var(--ease), color var(--fast) var(--ease); }
+.fast-phase.is-on { background: var(--warm); color: var(--bg); }
+.fast-phase.was { background: var(--warm-dim); color: var(--warm); }
+.fast-desc { color: var(--ink-2); }
+.fast-desc b { color: var(--ink); font-weight: 500; }
+@media (max-width: 560px) { .fast-phases { grid-template-columns: 1fr 1fr; } }
+
+/* lienzo 2D genérico */
+.canvas-box { position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--bg-2); }
+.canvas-box canvas { width: 100%; height: 320px; }
+.canvas-box .bar { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; padding: var(--s3) var(--s4); border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); }
+.canvas-box .bar label { display: flex; align-items: center; gap: var(--s2); }
+.canvas-box .bar input[type="range"] { width: 120px; }
+.canvas-box .read { margin-left: auto; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* pasos (muerte, protocolo) */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); counter-reset: step; }
+.steps li {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: var(--s4); padding: var(--s4) 0; border-top: 1px solid var(--line);
+}
+.steps li::before {
+  counter-increment: step; content: "0" counter(step);
+  font-family: var(--f-display); font-size: var(--t4); line-height: 1; color: var(--ink-3);
+}
+.steps li.alert::before { color: var(--alert); }
+.steps li.warm::before { color: var(--warm); }
+.steps h3 { font-size: var(--t1); font-family: var(--f-body); font-weight: 500; }
+.steps p { color: var(--ink-2); margin-top: var(--s1); max-width: 60ch; }
+.steps .when { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.08em; }
+
+/* teoría del todo: acordeón */
+.theory { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.theory details { background: var(--bg-2); }
+.theory summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: var(--s4); align-items: center;
+  padding: var(--s5); transition: background var(--fast) var(--ease);
+}
+.theory summary::-webkit-details-marker { display: none; }
+.theory summary:hover { background: var(--bg-3); }
+.theory summary .r { font-family: var(--f-display); font-size: var(--t3); color: var(--warm); line-height: 1; }
+.theory summary h3 { font-size: var(--t2); }
+.theory summary .x { font-family: var(--f-mono); color: var(--ink-3); transition: transform var(--fast) var(--ease); }
+.theory details[open] summary .x { transform: rotate(45deg); }
+.theory .body { padding: 0 var(--s5) var(--s6) calc(72px + var(--s4) + var(--s5)); color: var(--ink-2); display: grid; gap: var(--s3); max-width: 70ch; }
+.theory .body strong { color: var(--ink); font-weight: 500; }
+@media (max-width: 560px) {
+  .theory summary { grid-template-columns: 48px 1fr auto; }
+  .theory .body { padding-left: var(--s5); }
+}
+
+/* generador binaural */
+.binaural { display: grid; gap: var(--s5); padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2); }
+.binaural-head { display: flex; justify-content: space-between; gap: var(--s4); flex-wrap: wrap; align-items: center; }
+.binaural-warn { font-family: var(--f-mono); font-size: 0.72rem; color: var(--alert); letter-spacing: 0.06em; }
+.binaural-grid { display: grid; grid-template-columns: 1fr; gap: var(--s4); }
+@media (min-width: 640px) { .binaural-grid { grid-template-columns: 1fr 1fr; } }
+.binaural-ctl { display: grid; gap: var(--s2); }
+.binaural-ctl label { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); letter-spacing: 0.06em; display: flex; justify-content: space-between; }
+.binaural-ctl label b { color: var(--warm); font-weight: 500; font-variant-numeric: tabular-nums; }
+.binaural-read { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.binaural-read div { background: var(--bg-3); padding: var(--s3) var(--s4); font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); }
+.binaural-read div b { display: block; color: var(--ink); font-size: var(--t1); font-weight: 400; font-family: var(--f-display); margin-top: 2px; }
+.binaural-scope { height: 90px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+.binaural-scope canvas { width: 100%; height: 100%; }
+.brain-waves { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
+.brain-waves div { padding: var(--s2); border-radius: 3px; background: var(--bg-4); font-family: var(--f-mono); font-size: 0.66rem; color: var(--ink-3); text-align: center; }
+.brain-waves div.is-on { background: var(--warm); color: var(--bg); }
+@media (max-width: 480px) { .brain-waves, .binaural-read { grid-template-columns: 1fr 1fr; } }
+
+/* herramientas */
+.tools { display: grid; grid-template-columns: 1fr; gap: var(--s3); }
+@media (min-width: 720px) { .tools { grid-template-columns: 1fr 1fr; } }
+.tool { padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2); display: grid; gap: var(--s2); }
+.tool .k { font-family: var(--f-mono); font-size: 0.7rem; color: var(--warm); letter-spacing: 0.1em; text-transform: uppercase; }
+.tool h3 { font-size: var(--t1); font-family: var(--f-body); font-weight: 500; }
+.tool p { color: var(--ink-2); font-size: var(--t-1); }
+
+/* bitácora: entradas */
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.log li { background: var(--bg); padding: var(--s6) 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--s4); }
+.log .n { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.08em; padding-top: 6px; }
+.log blockquote { margin: 0; font-family: var(--f-display); font-size: var(--t2); line-height: 1.25; color: var(--ink); max-width: 30ch; }
+.log .ctx { margin-top: var(--s3); color: var(--ink-2); font-size: var(--t-1); max-width: 60ch; }
+@media (max-width: 560px) { .log li { grid-template-columns: 1fr; gap: var(--s2); } }
+
+/* pensadores */
+.thinkers { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+@media (min-width: 640px) { .thinkers { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1000px) { .thinkers { grid-template-columns: 1fr 1fr 1fr; } }
+.thinker { background: var(--bg-2); padding: var(--s4) var(--s5); }
+.thinker h3 { font-size: var(--t1); }
+.thinker .k { font-family: var(--f-mono); font-size: 0.68rem; color: var(--ink-3); letter-spacing: 0.08em; margin-top: 2px; }
+.thinker p { color: var(--ink-2); font-size: var(--t-1); margin-top: var(--s2); }
+
+/* portada */
+.hero-thesis { display: grid; gap: var(--s5); max-width: 1100px; }
+.hero-line {
+  font-family: var(--f-display); font-size: clamp(var(--t3), 4.5vw, var(--t5)); line-height: 1.15; max-width: 22ch;
+}
+.hero-line em { color: var(--warm); }
+.typed { font-family: var(--f-mono); font-size: var(--t-1); color: var(--cold); letter-spacing: 0.04em; min-height: 1.6em; }
+.typed::after { content: "▍"; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.map { display: grid; grid-template-columns: 1fr; gap: var(--s3); }
+@media (min-width: 720px) { .map { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .map { grid-template-columns: 1fr 1fr 1fr; } }
+.map-card {
+  text-align: left; padding: var(--s5); border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2);
+  display: grid; gap: var(--s2); transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.map-card:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+.map-card .n { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.08em; }
+.map-card[data-world="matrix"] .n { color: var(--cold); }
+.map-card[data-world="real"] .n { color: var(--warm); }
+.map-card h3 { font-size: var(--t2); }
+.map-card p { color: var(--ink-2); font-size: var(--t-1); }
+
+.legend { display: flex; flex-wrap: wrap; gap: var(--s4); font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.06em; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: var(--s2); vertical-align: -1px; }
+.legend .c::before { background: var(--cold); } .legend .w::before { background: var(--warm); } .legend .a::before { background: var(--alert); }
+
+/* diferencias hombre / mujer */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: var(--t-1); }
+th, td { text-align: left; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; background: var(--bg-2); }
+td:first-child { color: var(--ink); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+
+/* pie */
+.footer { padding: var(--s8) var(--s5); border-top: 1px solid var(--line); color: var(--ink-3); font-family: var(--f-mono); font-size: 0.72rem; line-height: 1.8; }
+.footer b { color: var(--ink-2); font-weight: 500; }
+@media (min-width: 720px) { .footer { padding: var(--s8); } }
+
+/* navegación siguiente capítulo */
+.next { display: flex; justify-content: flex-end; max-width: 1100px; }
+.next button { display: grid; gap: 2px; text-align: right; padding: var(--s4) 0; border-top: 1px solid var(--line); width: 100%; }
+.next button:hover .t { color: var(--warm); }
+.next .k { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; }
+.next .t { font-family: var(--f-display); font-size: var(--t3); transition: color var(--fast) var(--ease); }
+
+/* ---------- móvil: barra superior en una sola línea ---------- */
+@media (max-width: 720px) { .brand-author { display: none; } .brand-name { font-size: var(--t0); } }
+@media (max-width: 560px) { .topbar-status { display: none; } .chapter-index { font-size: 5rem; top: var(--s4); } }
+.chapter-body, .chapter-head { min-width: 0; }
+.wide, .block { min-width: 0; }
+
+</style>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-name">Bitácora de un Observador</span>
+    <span class="brand-author">Fabio Iván Castañeda Fuentes</span>
+  </div>
+  <div class="topbar-status" aria-live="polite">estado: <b id="status">observando</b></div>
+</header>
+
+<div class="shell">
+
+  <nav class="rail" aria-label="Capítulos">
+    <ul class="rail-list" id="rail">
+      <li><button class="rail-btn" data-go="inicio"><span class="n">00</span><span class="t">Wake up</span></button></li>
+      <li><button class="rail-btn" data-go="matrix" data-world="matrix"><span class="n">01</span><span class="t">La Matrix</span></button></li>
+      <li><button class="rail-btn" data-go="hardware"><span class="n">02</span><span class="t">El hardware</span></button></li>
+      <li><button class="rail-btn" data-go="software"><span class="n">03</span><span class="t">Ego, mente y consciencia</span></button></li>
+      <li><button class="rail-btn" data-go="universo"><span class="n">04</span><span class="t">El universo</span></button></li>
+      <li><button class="rail-btn" data-go="vida"><span class="n">05</span><span class="t">Vida y muerte</span></button></li>
+      <li><button class="rail-btn" data-go="amor"><span class="n">06</span><span class="t">El amor</span></button></li>
+      <li><button class="rail-btn" data-go="teoria"><span class="n">07</span><span class="t">La Teoría del Todo</span></button></li>
+      <li><button class="rail-btn" data-go="manual"><span class="n">08</span><span class="t">Manual de operación</span></button></li>
+      <li><button class="rail-btn" data-go="bitacora"><span class="n">09</span><span class="t">Bitácora</span></button></li>
+    </ul>
+    <div class="rail-foot">
+      cian = lo construido por humanos<br>
+      ámbar = lo que ya estaba ahí<br><br>
+      nadie oculta la información.<br>nadie la regala.
+    </div>
+  </nav>
+
+  <main class="content" id="content">
+
+  <!-- ============================================================ 00 -->
+  <section class="chapter is-active" id="inicio" data-world="real">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">00</span>
+      <p class="eyebrow warm">Entrada 00 · Portada</p>
+      <h1 class="chapter-title">Somos el <em>universo</em> mirándose al espejo.</h1>
+      <p class="chapter-lede">Esta es una bitácora, no un libro de autoayuda. Aquí desarmo, pieza por pieza, lo que un humano puede saber de sí mismo con la información que ya tenemos: física, biología, neurociencia y lo que nos enseñaron los que despertaron antes. Sin magia. Sin dogma. En palabras humanas.</p>
+    </div>
+
+    <figure class="artefact" data-scene="lattice">
+      <canvas aria-label="Artefacto: la Lattice, una red de puntos vibrando en el espacio"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 00</b> · la Lattice</span><span>mueve el cursor: la materia responde al observador</span></figcaption>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="hero-thesis">
+        <p class="typed" id="typed" aria-live="off"></p>
+        <p class="hero-line">¿Alguna vez te has parado un segundo, olvidado de todo, y te has dado cuenta de que <em>estás vivo</em>? De que sos un animal, en una roca que flota, viendo la vida como un POV.</p>
+      </div>
+
+      <div class="block">
+        <p class="lead">Nadie nunca te lo dice. Pensamos en el trabajo, en la relación, en la sociedad. Nunca en el hecho más obvio de todos.</p>
+        <p>Cuando por fin lo ves, hay una astilla en la mente que ya no se saca. Todo lo que dábamos por hecho —el colegio, el dinero, el estatus, lo que "debe" ser una vida— resulta ser un hipercampo: una construcción de miles de años de humanos acumulando información y tomándosela personal. Y debajo de esa construcción está lo real: un cuerpo de primate, un cerebro que consume el 20&nbsp;% de tu energía, y un universo que no tiene un plan pero sí tiene reglas.</p>
+        <p>Esta bitácora separa las dos cosas. Lo que <strong>construimos</strong> (cian) y lo que <strong>ya estaba ahí</strong> (ámbar). No para destruir el sistema —el sistema es el tablero en el que vinimos a jugar— sino para jugarlo con el código fuente abierto.</p>
+      </div>
+
+      <div class="callout">
+        La felicidad es la decisión de transitar el caos de la vida con una mirada de agradecimiento, mientras luchamos por un propósito que para nosotros valga la pena.
+        <small>Definición de trabajo · esta bitácora</small>
+      </div>
+
+      <div class="wide">
+        <p class="eyebrow" style="margin-bottom:16px">Mapa de la bitácora</p>
+        <div class="map">
+          <button class="map-card" data-go="matrix" data-world="matrix"><span class="n">01 · construido</span><h3>La Matrix</h3><p>Maya, el sistema prusiano, las tres Matrix, la pastilla y la trampa de Zion.</p></button>
+          <button class="map-card" data-go="hardware" data-world="real"><span class="n">02 · real</span><h3>El hardware</h3><p>El cerebro por capas, el SARA, la DMN, el ayuno, el ejercicio y las sustancias.</p></button>
+          <button class="map-card" data-go="software" data-world="real"><span class="n">03 · real</span><h3>Ego, mente y consciencia</h3><p>El mapa definitivo: hardware, software y antena. Por qué el ego no es el enemigo.</p></button>
+          <button class="map-card" data-go="universo" data-world="real"><span class="n">04 · real</span><h3>El universo</h3><p>Lattice e hipercampo, entropía, el universo de energía cero, fractales.</p></button>
+          <button class="map-card" data-go="vida" data-world="real"><span class="n">05 · real</span><h3>Vida y muerte</h3><p>De la rata bajo tierra al sapiens. Qué pasa cuando el vaso se rompe.</p></button>
+          <button class="map-card" data-go="amor" data-world="real"><span class="n">06 · real</span><h3>El amor</h3><p>Amor de ego y amor de consciencia. Los acuerdos, la resta antes de la suma.</p></button>
+          <button class="map-card" data-go="teoria"><span class="n">07 · síntesis</span><h3>La Teoría del Todo</h3><p>Los diez puntos que unen la física, la biología, la mente y el amor.</p></button>
+          <button class="map-card" data-go="manual"><span class="n">08 · práctica</span><h3>Manual de operación</h3><p>Cómo usarla el lunes por la mañana. Incluye un generador binaural real.</p></button>
+          <button class="map-card" data-go="bitacora"><span class="n">09 · archivo</span><h3>Bitácora</h3><p>Las entradas: frases que sobrevivieron al proceso, y los que pensaron antes.</p></button>
+        </div>
+      </div>
+
+      <div class="next"><button data-go="matrix"><span class="k">siguiente</span><span class="t">01 · La Matrix →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 01 -->
+  <section class="chapter" id="matrix" data-world="matrix">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">01</span>
+      <p class="eyebrow cold">Entrada 01 · Lo construido</p>
+      <h1 class="chapter-title">La Matrix <em>ya te tiene</em>. No hace falta una cárcel física.</h1>
+      <p class="chapter-lede">Nadie nos puso una jaula. Nos dieron un idioma, un colegio, un reloj y un sueldo, y con eso nos construimos la jaula solos. La Matrix no es una conspiración: es un sistema que corre en piloto automático porque es económicamente eficiente. Aquí está el código.</p>
+    </div>
+
+    <figure class="artefact" data-scene="cage">
+      <canvas aria-label="Artefacto: una jaula de líneas que se disuelve al acercar el cursor"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 01</b> · la cárcel mental</span><span>acerca el cursor a los barrotes: solo existen mientras no los miras</span></figcaption>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="block">
+        <h2>Tres Matrix, una encima de la otra</h2>
+        <p>Durante 290&nbsp;000 años el propósito humano era coherente con nuestro diseño: cazar juntos, proteger a la manada, contar historias alrededor del fuego. El sistema estaba en equilibrio. Después llegaron tres actualizaciones que secuestraron nuestra necesidad biológica de propósito y la canalizaron hacia jerarquías inventadas.</p>
+      </div>
+
+      <ol class="timeline wide">
+        <li>
+          <span class="when">hace ~10 000 años · Revolución Agrícola</span>
+          <h3>Matrix 1 · La propiedad</h3>
+          <p>El humano dejó de moverse, plantó trigo, construyó cercos y dijo "esta tierra es mía". Nació la propiedad privada, y con ella la necesidad de asegurar herederos: el matrimonio como contrato económico, la religión como respaldo del contrato, la ley como su brazo. El amor tribal se reemplazó por la ansiedad de proteger el patrimonio.</p>
+        </li>
+        <li>
+          <span class="when">siglo XIX · máquina de vapor + sistema prusiano</span>
+          <h3>Matrix 2 · El obrero obediente</h3>
+          <p>La Revolución Industrial necesitaba humanos que toleraran doce horas de aburrimiento sin cuestionar a la autoridad. El sistema educativo prusiano se diseñó exactamente para eso: sentar a niños con genética de cazador en un pupitre, estandarizar cerebros y matar la capacidad de explorar. Hoy nadie lo conspira; simplemente sigue funcionando porque conviene.</p>
+        </li>
+        <li>
+          <span class="when">ahora · atención como mercancía</span>
+          <h3>Matrix 3 · El hipercampo digital</h3>
+          <p>El sistema ya no necesita encerrar tu cuerpo. Le basta con secuestrar tu Sistema Activador Reticular y tu dopamina: pantallas diseñadas por ingenieros para inventarte depredadores imaginarios (estatus, likes, deudas) aunque tengas el estómago lleno y el techo asegurado. Aquí es donde la pobreza sí se vuelve mental.</p>
+        </li>
+      </ol>
+
+      <div class="block">
+        <h2>Maya, Vairagya, Lila</h2>
+        <p>Los hindúes mapearon la pastilla roja hace miles de años, sin computadoras ni Keanu Reeves. Tres etapas, exactamente en este orden:</p>
+        <ul>
+          <li><strong>Maya (la ilusión).</strong> Creer que el trabajo de 9 a 5, la cuenta de banco y lo que opina la tribu son la realidad absoluta. El chimpancé estresado en el tráfico convencido de que el semáforo es una ley del universo.</li>
+          <li><strong>Vairagya (el desapego, el shock).</strong> El vértigo. Descubrir que Maya es falso, temblar viendo la película, sentir que todos alrededor están hipnotizados y querer despertarlos a la fuerza para no sentirte solo. Aquí se queda atrapado el que se amarga.</li>
+          <li><strong>Lila (el juego divino).</strong> Entender el chiste. El universo no creó el mundo material como una prisión sino como un tablero para experimentarse a sí mismo. Regresas al tráfico, al dinero y a pagar la luz, pero ya no desde el miedo: jugando. Y como sabes que es un juego, te vuelves el mejor jugador.</li>
+        </ul>
+      </div>
+
+      <div class="wide">
+        <p class="eyebrow cold" style="margin-bottom:16px">Elige tu pastilla</p>
+        <div class="pills" id="pills">
+          <button class="pill-btn blue" data-pill="blue" aria-pressed="false"><span class="cap" aria-hidden="true"></span><h3>Azul</h3><p>Deliciosa. Diseñada y perfeccionada por milenios de sociedad para que nunca tengas que enfrentarte al vacío.</p></button>
+          <button class="pill-btn red" data-pill="red" aria-pressed="false"><span class="cap" aria-hidden="true"></span><h3>Roja</h3><p>Ya no hay vuelta atrás. Como aprender a leer: nunca más vuelves a ver las letras como manchas.</p></button>
+        </div>
+        <div class="pill-out" id="pillOut"><p class="eyebrow">respuesta del sistema</p><p>Ninguna pastilla seleccionada. La Matrix sigue corriendo en segundo plano.</p></div>
+      </div>
+
+      <div class="block">
+        <h2>La trampa de Zion</h2>
+        <p>Es la tesis final de la trilogía, y la mayoría se la salta: Zion nunca fue la libertad. Fue diseñada por el Arquitecto como un nivel secundario de control para contener al 1&nbsp;% de mentes que rechazan la simulación principal.</p>
+        <p>En la vida real, Zion es la contracultura. El que deja su trabajo para ser "libre" y termina esclavo de un gurú de criptomonedas. El que se vuelve hiperespiritual y ahora juzga a todos los que no meditan. El "Red Pill" de internet: hombres que descubrieron que el sistema está arreglado y en lugar de soltar el ego lo engordaron, obsesionados con Rolex, estatus y dominar a las mujeres. Siguen esclavizados al hardware más primitivo del mono; solo cambiaron de servidor. Son esclavos que presumen el color de sus cadenas.</p>
+        <p>Salir de la Matrix no es huir al bosque. Si escapas literalmente de la economía y la tecnología, regresas a la versión 1.0 de la humanidad y todo tu ancho de banda se va en cazar tu comida. La verdadera libertad es usar la infraestructura del sistema a tu favor: la cama caliente, el internet, el supermercado, para comprar el activo más caro del universo, tiempo libre para darle tu propio significado a la vida.</p>
+      </div>
+
+      <div class="two-worlds wide">
+        <div class="world cold">
+          <p class="eyebrow cold">software del sistema</p>
+          <h3>Lo que la Matrix te instaló</h3>
+          <ul>
+            <li>Tu valor se mide en productividad y en un cheque cada quince días.</li>
+            <li>El descanso es sedarte frente a una pantalla.</li>
+            <li>El amor es un contrato, una validación, un drama de Disney.</li>
+            <li>Desaprender es admitir debilidad y perder rango.</li>
+            <li>Hay un examen final. Alguien te está calificando.</li>
+            <li>El pacto de silencio: yo no te recuerdo el abismo, tú no me lo recuerdas a mí.</li>
+          </ul>
+        </div>
+        <div class="world warm">
+          <p class="eyebrow warm">código fuente</p>
+          <h3>Lo que ya estaba ahí</h3>
+          <ul>
+            <li>Un primate diseñado para cazar en intervalos cortos y descansar mucho.</li>
+            <li>Un cerebro que se alarma porque no tiene recursos, no porque seas un fracaso.</li>
+            <li>Un vínculo de manada que existe antes y después de cualquier papel.</li>
+            <li>La humildad como ahorro de energía: el ego frágil gasta más.</li>
+            <li>No hay juez. El propósito lo inventas tú con tu tribu.</li>
+            <li>La información siempre estuvo ahí. Nadie la oculta, nadie la regala.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Por qué no debatir con nadie</h2>
+        <p>Un debate entre dos personas dormidas no es un intercambio de ideas: es una pelea territorial por serotonina. Cuando atacas la creencia de alguien, su cerebro no lo procesa en la corteza prefrontal como un argumento; lo procesa en la amígdala como un ataque físico, como si lo estuvieras expulsando de su tribu. Por eso gritan y se cierran.</p>
+        <p>El que se aferra a la Tierra plana no lo hace por estupidez: el ego prefiere un carcelero antes que el vacío. Si hay un muro de hielo, alguien lo construyó, alguien nos vigila, somos el centro. Aceptar que somos un primate en una roca mojada girando alrededor de una bola de fuego ordinaria, en un rincón irrelevante de una galaxia, aterra. Y la lógica termodinámica lo desarma sola: si hubiera tierras vírgenes detrás de un muro, la especie más invasiva y hambrienta de recursos del planeta ya las habría colonizado y cobrado entrada.</p>
+        <p>La regla del observador: te ríes, sigues el juego, dices "en realidad ninguno lo puede comprobar", y sigues con tu paz intacta.</p>
+      </div>
+
+      <div class="callout cold">
+        Lo feo de la Matrix no es que exista. Es que no la vemos y nos permitimos que nos haga daño.
+        <small>Bitácora · entrada sobre la jaula</small>
+      </div>
+
+      <div class="next"><button data-go="hardware"><span class="k">siguiente</span><span class="t">02 · El hardware →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 02 -->
+  <section class="chapter" id="hardware" data-world="real">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">02</span>
+      <p class="eyebrow warm">Entrada 02 · Lo real</p>
+      <h1 class="chapter-title">Un chasis africano de <em>300 000 años</em> corriendo software moderno.</h1>
+      <p class="chapter-lede">Tu cuerpo es un vehículo de supervivencia prehistórico. Casi todo lo que llamas "estar triste", "ser perezoso" o "tener ansiedad" es un indicador del panel de ese vehículo. Aquí está el manual técnico.</p>
+    </div>
+
+    <figure class="artefact" data-scene="neurons">
+      <canvas aria-label="Artefacto: una red de neuronas disparando pulsos"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 02</b> · red neuronal</span><span>86 000 millones de neuronas disparando electricidad; esto es una muestra</span></figcaption>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="block">
+        <h2>El cerebro por niveles de acceso</h2>
+        <p>No es un órgano: son cuatro capas de hardware apiladas por la evolución, cada una con un nivel de acceso distinto. Toca cada región.</p>
+      </div>
+
+      <div class="brain wide">
+        <svg class="brain-svg" viewBox="0 0 420 320" role="img" aria-label="Mapa esquemático del cerebro visto de perfil">
+          <path class="region" data-region="neo" d="M60,158 C58,86 132,40 222,44 C306,48 356,92 356,152 C356,196 322,226 280,228 L124,228 C92,222 62,196 60,158 Z"></path>
+          <path class="region" data-region="pre" d="M60,158 C60,100 98,58 150,50 L150,228 L124,228 C92,222 62,196 60,158 Z"></path>
+          <ellipse class="region" data-region="lim" cx="218" cy="156" rx="64" ry="36"></ellipse>
+          <ellipse class="region" data-region="rep" cx="306" cy="238" rx="40" ry="22"></ellipse>
+          <path class="region" data-region="rep" d="M232,222 C242,246 236,272 250,300 L278,300 C266,272 272,246 262,222 Z"></path>
+          <text x="66" y="290">frente ←</text>
+          <text x="330" y="290">→ nuca</text>
+          <text x="86" y="120">prefrontal</text>
+          <text x="196" y="80">neocórtex</text>
+          <text x="196" y="160">límbico</text>
+          <text x="262" y="312">reptiliano</text>
+        </svg>
+        <div>
+          <ul class="brain-list" id="brainList">
+            <li><button data-region="rep"><span class="k">nivel 1 · BIOS</span><span class="v">Cerebro reptiliano</span></button></li>
+            <li><button data-region="lim"><span class="k">nivel 2 · usuario estándar</span><span class="v">Sistema límbico</span></button></li>
+            <li><button data-region="neo"><span class="k">nivel 3 · alta resolución</span><span class="v">Neocórtex</span></button></li>
+            <li><button data-region="pre"><span class="k">nivel 4 · modo admin</span><span class="v">Corteza prefrontal</span></button></li>
+          </ul>
+          <div class="brain-detail" id="brainDetail" style="margin-top:12px">
+            <h3>Elige una región</h3>
+            <p>El cerebro pesa el 2&nbsp;% de tu cuerpo y consume el 20&nbsp;% de tu energía. Por eso está obsesionado con ahorrar.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Los tres sistemas que confundimos con magia</h2>
+        <h3>SARA · el filtro de spam</h3>
+        <p>El Sistema Activador Reticular Ascendente es una red de neuronas del tamaño de tu meñique en la base del cráneo. Tu cerebro recibe millones de bits por segundo; el SARA filtra el 99&nbsp;% y solo deja pasar lo que le dijiste que era importante. Compras un carro y de repente lo ves en todas las calles: el universo no puso más carros, tu software le quitó el filtro de invisibilidad. Las "señales del universo" son esto. Enfócate en algo y tu hardware se encarga de renderizarlo.</p>
+        <h3>DMN · el asiento del ego</h3>
+        <p>La Red Neuronal por Defecto conecta el centro de tu frente con la parte de atrás de tu cerebro. Se enciende cuando "no estás haciendo nada": repasa el pasado, planea el futuro, mantiene la narrativa de quién eres. Es el piloto automático y el generador de la ilusión del "yo". Los psicodélicos, la meditación profunda y ciertas frecuencias la atenúan; cuando se apaga, el yo desaparece y te fundes con el presente.</p>
+        <h3>Neuronas espejo · el Wi-Fi social</h3>
+        <p>Cuando alguien te habla, tu cerebro copia sus microexpresiones, su tono y su postura para sentir lo que siente. Eso es el "sexto sentido", la "mala vibra", la "tensión en el aire": lectura de pupilas, mandíbula, respiración y feromonas de cortisol en milisegundos. Las "brujas" de la antigüedad eran mujeres con este hardware muy desarrollado, en una época en que nadie sabía que existía.</p>
+      </div>
+
+      <div class="rule wide"><span class="eyebrow warm">mantenimiento del hardware</span></div>
+
+      <div class="block">
+        <h2>El ayuno · liberar RAM digestiva</h2>
+        <p>Buda y Jesús no ayunaban para complacer a nadie: descubrieron empíricamente que cuando el cuerpo deja de digerir, la mente se afila. El sistema digestivo es la aplicación de fondo que más batería consume. Al cerrarla, la sangre y el oxígeno se van a la corteza prefrontal, el cuerpo cambia de combustible (cetonas en vez de glucosa) y entra en <strong>autofagia</strong>: recicla células viejas y proteínas rotas. Ese cosquilleo de hambre a la misma hora de siempre es <strong>ghrelina</strong>, un despertador por costumbre, no un medidor de gasolina. Tienes decenas de miles de calorías guardadas como grasa.</p>
+      </div>
+
+      <div class="fast wide">
+        <div class="fast-top">
+          <div><p class="eyebrow warm">reloj de ayuno · desde el último bocado</p><p class="fast-hours"><span id="fastH">16</span><small>horas</small></p></div>
+          <p class="eyebrow">el sueño cuenta: des‑ayuno = romper el ayuno</p>
+        </div>
+        <input type="range" id="fastRange" min="0" max="72" value="16" aria-label="Horas de ayuno">
+        <div class="fast-phases" id="fastPhases">
+          <div class="fast-phase" data-from="0">0–4 h · digiriendo</div>
+          <div class="fast-phase" data-from="4">4–12 h · vaciando glucógeno</div>
+          <div class="fast-phase" data-from="12">12–24 h · cetonas + autofagia</div>
+          <div class="fast-phase" data-from="24">24–72 h · reseteo profundo</div>
+        </div>
+        <p class="fast-desc" id="fastDesc"></p>
+      </div>
+
+      <div class="block">
+        <h2>El ejercicio · simulador de cacería</h2>
+        <p>Tu cerebro primitivo no sabe qué es una computadora. Si pasas seis horas sentado moviendo solo los dedos, registra una cosa: "estamos estáticos y escondidos; seguramente hay peligro; bajen el metabolismo". Por eso el trabajo de oficina es tan antinatural: estresas al software con problemas, pero el hardware no se mueve. Es acelerar un carro con el freno de mano puesto.</p>
+        <p>Levantar peso es un engaño termodinámico útil: le mandas al cuerpo la señal de que hay cacería y resistencia. Responde con adrenalina, dopamina y BDNF (fertilizante para neuronas). El ejercicio no te quita energía para trabajar; te la fabrica. Y no hay "sets": el músculo no sabe contar. Solo existe la tensión mecánica hasta el fallo técnico, el punto donde la postura se rompe porque la fibra ya no tiene ATP. Todo lo que dejas antes de ese punto es el ego huyendo de la incomodidad; todo lo que fuerzas después es negligencia contra tus tendones, que tardan meses en adaptarse mientras el músculo tarda días.</p>
+        <p>El mito de la productividad infinita es la pastilla azul más venenosa. Un león no siente culpa por dormir dieciséis horas bajo un árbol. Somos el único primate que se hace gaslighting por seguir sus propias leyes de conservación de energía. La pereza no existe como identidad; existe un estado biológico de inactividad que se rompe con fricción física, no pensando.</p>
+      </div>
+
+      <div class="block">
+        <h2>Sustancias, sin moral</h2>
+        <h3>Nicotina · el secuestro perfecto</h3>
+        <p>Una molécula impostora con la misma forma que tu acetilcolina. Libera dopamina sin esfuerzo, así que el cerebro apaga su fábrica natural y crea más receptores. El "relax" del cigarro solo alivia el estrés que el cigarro anterior te causó: pagas una suscripción diaria por la paz que ya tenías gratis. El 100&nbsp;% de la sustancia sale de la sangre en 72 horas; el resto son tres semanas de reseteo de receptores y picos de urgencia que duran exactamente tres minutos si logras distraer al sistema.</p>
+        <h3>Cannabis · la llave de la homeostasis</h3>
+        <p>Tu cuerpo fabrica su propio THC: la anandamida, la molécula que dice "ya pasó el peligro, relájate". El sistema endocannabinoide es el termostato del cuerpo: candados (receptores CB1 en el cerebro, CB2 en el sistema inmune), llaves (endocannabinoides) y una escoba (enzimas que limpian los candados). La llave de la planta encaja en los mismos candados pero la escoba no sabe romperla rápido; por eso tu weed interna dura minutos y la externa dura horas. El THC desincroniza la DMN quitándote la memoria a corto plazo: sin pasado ni futuro, el ego colapsa y quedas anclado al presente. Funciona como parche; no como puente único a tu consciencia.</p>
+        <h3>Psicodélicos · el tráiler de la película</h3>
+        <p>Psilocibina y LSD tienen la forma de la serotonina; inundan los receptores 5‑HT2A y apagan físicamente el nodo central de la DMN. Muestran el código fuente, pero es un estado prestado: el helicóptero te lleva a la cima y te baja. El trabajo rudo es descargar eso sobrio y construir las autopistas neuronales para llegar por tu cuenta. Es aprendizaje dependiente del estado: mucha gente se queda iluminada solo cuando está drogada, e inútil el lunes.</p>
+      </div>
+
+      <div class="block">
+        <h2>Dos hardware, dos realidades</h2>
+        <p>Todos los embriones empiezan siendo hembras. Si el espermatozoide trae un cromosoma Y, alrededor de la octava semana ocurre un baño de testosterona que reescribe el cerebro del feto: reduce centros de comunicación, encoge áreas de empatía, expande agresividad y procesamiento espacial. La regla que gobierna todo lo demás es termodinámica: el esperma es barato, los óvulos son caros. Un hombre puede tener cien hijos en un año; una mujer, uno, y nueve meses vulnerable. Con esa asimetría de riesgo, cada hardware calibró sensores distintos.</p>
+      </div>
+
+      <div class="table-wrap wide">
+        <table>
+          <thead><tr><th>Sensor</th><th>Hardware femenino (XX)</th><th>Hardware masculino (XY)</th><th>Razón evolutiva</th></tr></thead>
+          <tbody>
+            <tr><td>Visión</td><td>Periférica, alto rango de color</td><td>Túnel: velocidad, distancia, movimiento</td><td>Recolectar frutos vs. cazar a lo lejos</td></tr>
+            <tr><td>Escucha</td><td>Rango amplio, detecta tono emocional</td><td>Menos sensible al tono, detecta dirección</td><td>Oír el llanto de una cría que no habla</td></tr>
+            <tr><td>Neuronas espejo</td><td>Hiperreactivas: microexpresiones en ms</td><td>Moderadas: amenazas corporales mayores</td><td>Mantener la paz de la tribu</td></tr>
+            <tr><td>Estrés</td><td>Oxitocina: cuidar y agruparse</td><td>Adrenalina: pelear o aislarse</td><td>Proteger a la cría vs. enfrentar al depredador</td></tr>
+            <tr><td>Radar de atracción</td><td>Competencia, estatus, estabilidad emocional</td><td>Geometría: fertilidad, simetría</td><td>Seguridad para la cría vs. genes viables</td></tr>
+            <tr><td>Agresión</td><td>Indirecta: exclusión, reputación</td><td>Directa: golpes de pecho, jerarquía</td><td>Una pelea física era inaceptable para una madre</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="block">
+        <p>Ninguno de los dos está diseñado para la oficina, pero el sistema corporativo de 8 a 5 fue inventado por hombres para premiar picos de testosterona. Obligar al hardware femenino —optimizado para cohesión y redes— a competir en aislamiento vertical dispara su cortisol. No están "menos preparadas"; están corriendo un software que penaliza sus fortalezas. Y sí: un hombre puede instalar el radar femenino con neuroplasticidad, y ese es el chiste de la pareja, prestarse RAM.</p>
+      </div>
+
+      <div class="block">
+        <h2>Los sueños · el simulador de amenazas</h2>
+        <p>Al dormir, la corteza prefrontal (la lógica) se apaga para repararse, pero la amígdala y el hipocampo siguen encendidos desfragmentando el disco: archivan lo del día mezclándolo con memorias viejas. Como el jefe lógico duerme y el tálamo corta la conexión con los ojos y proyecta desde adentro, todo se siente real. Los sueños feos son simulacros de incendio: tu hardware ensaya la peor situación posible para probar tus defensas. Soñar tres noches seguidas lo mismo es un bucle de retroalimentación alimentado por tu propia ansiedad, no una profecía. La auditoría se hace despierto, con la lógica encendida, contra la evidencia del mundo físico.</p>
+      </div>
+
+      <div class="callout">
+        A veces dices "estoy triste", "estoy enojado", y en realidad solo tenías hambre o sueño. Le damos peso místico a cosas puramente mecánicas.
+        <small>Bitácora · sobre limpiar la raíz</small>
+      </div>
+
+      <div class="next"><button data-go="software"><span class="k">siguiente</span><span class="t">03 · Ego, mente y consciencia →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 03 -->
+  <section class="chapter" id="software" data-world="real">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">03</span>
+      <p class="eyebrow warm">Entrada 03 · Lo real</p>
+      <h1 class="chapter-title">El ego es el <em>empleado más fiel</em>. El problema es quién le da las órdenes.</h1>
+      <p class="chapter-lede">Hardware, software y antena. Mente, ego, consciencia, observador y alma no son sinónimos: son capas distintas del mismo sistema, y confundirlas es no saber qué reiniciar cuando algo colapsa.</p>
+    </div>
+
+    <figure class="artefact" data-scene="rings">
+      <canvas aria-label="Artefacto: cuatro anillos concéntricos girando, uno por nivel del sistema"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 03</b> · los cuatro niveles</span><span>cuerpo · ego · consciencia · observador</span></figcaption>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="block">
+        <h2>El mapa definitivo</h2>
+        <p>La ciencia clásica creía que el cerebro fabricaba la consciencia. La física de vanguardia apunta a otra cosa: el cerebro no la fabrica, la sintoniza. Con esa premisa, todo el enredo de términos se ordena en tres niveles.</p>
+      </div>
+
+      <div class="stack wide">
+        <p class="stack-title">Nivel 1 · Hardware · lo que tocas, alimentas y se pudre cuando mueres</p>
+        <div class="layer hw"><span class="k">placa base</span><div><h3>Cerebro y sistema nervioso</h3><p>Una red física de cables (neuronas) y químicos. No genera magia, genera electricidad. Recibe datos de las cámaras (ojos) y micrófonos (oídos) y los manda al procesador.</p></div></div>
+        <div class="layer hw"><span class="k">disco duro</span><div><h3>Sinapsis</h3><p>Donde se guardan tus recuerdos, cómo manejar bicicleta, qué significa el rojo. Cada evento deja una cicatriz química aquí.</p></div></div>
+        <div class="layer hw"><span class="k">periféricos</span><div><h3>Corazón y estómago</h3><p>El corazón tiene ~40 000 neuronas propias; el intestino, ~500 millones (más que el cerebro de un perro) y produce el 90&nbsp;% de tu serotonina. Las mariposas y el nudo en el estómago son un segundo cerebro procesando.</p></div></div>
+
+        <p class="stack-title">Nivel 2 · Software · surge cuando el hardware tiene electricidad; si la máquina se daña, falla</p>
+        <div class="layer sw"><span class="k">sistema operativo</span><div><h3>La mente</h3><p>No es el cerebro. El cerebro es el silicio; la mente es el Windows. Es el proceso lógico: calcular, imaginar, procesar lenguaje. El entorno donde corren todos los programas.</p></div></div>
+        <div class="layer sw"><span class="k">perfil + antivirus</span><div><h3>El ego</h3><p>Un programa dentro de la mente. La carpeta "Usuario: Fabio": nombre, gustos, miedos, autoimagen. Su función principal es ser el antivirus de supervivencia: defender el hardware. Por eso asume que todo es un ataque, y por eso a veces consume toda tu RAM. Físicamente vive en la Red Neuronal por Defecto.</p></div></div>
+
+        <p class="stack-title">Nivel 3 · Antena y señal · no pertenece al cuerpo; el cuerpo solo la recibe</p>
+        <div class="layer ant"><span class="k">campo</span><div><h3>La consciencia</h3><p>Como la gravedad o el electromagnetismo: una propiedad del universo, un campo invisible que está en todos lados. La capacidad pura de darse cuenta. No es tuya ni mía; simplemente es. Una materia que no tiene quien la vea no existe en ningún lado.</p></div></div>
+        <div class="layer ant"><span class="k">dispositivo</span><div><h3>El observador</h3><p>La consciencia focalizada a través de tu hardware. Si la consciencia es un océano, el observador es el agua que cabe en un vaso llamado Fabio, viendo el mundo desde ahí. No eres el sistema operativo ni el perfil: eres el usuario frente a la pantalla.</p></div></div>
+        <div class="layer ant"><span class="k">dirección IP</span><div><h3>El alma</h3><p>La huella electromagnética única de tu observador; la sinergia de cerebro, corazón y estómago vibrando en armonía. La palabra poética que inventamos para el momento en que hardware, software y usuario están alineados sin fricción.</p></div></div>
+      </div>
+
+      <div class="block">
+        <h2>Los cuatro niveles de la existencia</h2>
+        <ul>
+          <li><strong>El cuerpo (hardware).</strong> Responde a leyes medibles: dopamina, hipertrofia, cortisol, sueño. Muchos "dramas psicológicos" son alertas de que necesita comida o descanso.</li>
+          <li><strong>El ego (software ejecutivo).</strong> El animal funcional. Sobrevivir, reproducirse, dejar legado, evitar el dolor. Útil, pero ciego.</li>
+          <li><strong>La consciencia (el usuario).</strong> La fuerza que observa el caos del ego y decide crear orden, acuerdos, amor a largo plazo, arte.</li>
+          <li><strong>El observador (el productor en la silla).</strong> El punto neutro. Ves el vúmetro en rojo —la emoción, el impulso— y decides qué hacer con esa información.</li>
+        </ul>
+        <p>Y el cuarto nivel de la mente según los hindúes, <strong>el Todo</strong>: la revelación donde colapsa la ilusión de individualidad y entiendes que nunca fuiste una gota separada; siempre fuiste el océano.</p>
+      </div>
+
+      <div class="block">
+        <h2>Redención del ego</h2>
+        <p>La espiritualidad comercial dice "mata al ego". Eso, en el plano material, es un suicidio operativo: te quedas sentado en una montaña, desconectado, inservible. El ego es tu traje espacial, tu máquina de interacción con la materia, el motor V8 que levanta empresas y trabaja puntual aunque le pagues cinco quetzales. No se mata: se desarma, se audita y se dirige. Si la consciencia no está al mando, el ego decide desde el miedo primitivo. Si tú decides el objetivo, el ego se vuelve imparable.</p>
+        <p>Y cuidado con la mutación: cuando entiendes Lila, el ego intenta crear un drama nuevo, "yo entiendo esto y ellos no". Ese es el ego espiritual. Si lo dejas crecer, el chip te aísla. Dudar de tu propia arrogancia es la prueba de que sigues en control.</p>
+      </div>
+
+      <div class="block">
+        <h2>Administrador de tareas</h2>
+        <p>La consciencia no se fabrica ni se genera en mayor cantidad. Lo que cambia es cuánta RAM de tu corteza prefrontal está secuestrada por procesos de fondo. Mueve los deslizadores.</p>
+      </div>
+
+      <div class="ram wide" id="ram">
+        <div class="ram-rows">
+          <div class="ram-row"><label for="r1">miedo al rechazo de la tribu (vender, mostrarte)</label><span class="val" data-for="r1">60 %</span><input type="range" id="r1" min="0" max="100" value="60"></div>
+          <div class="ram-row"><label for="r2">deudas y supervivencia imaginaria</label><span class="val" data-for="r2">45 %</span><input type="range" id="r2" min="0" max="100" value="45"></div>
+          <div class="ram-row"><label for="r3">validación externa y estatus</label><span class="val" data-for="r3">50 %</span><input type="range" id="r3" min="0" max="100" value="50"></div>
+          <div class="ram-row"><label for="r4">rumiación: pasado y futuro (DMN)</label><span class="val" data-for="r4">55 %</span><input type="range" id="r4" min="0" max="100" value="55"></div>
+        </div>
+        <div class="ram-bar" aria-hidden="true"><div class="seg ego" id="ramEgo"></div><div class="seg free" id="ramFree"></div></div>
+        <div class="ram-read"><span>ego en primer plano</span><span>RAM libre para el observador: <b id="ramPct">—</b></span></div>
+        <p class="ram-msg" id="ramMsg"></p>
+      </div>
+
+      <div class="block">
+        <h2>Estar consciente de algo</h2>
+        <p>Cuando la gente dice "sí, estoy consciente de que el azúcar hace mal" y al minuto se come el pastel, no está consciente: tiene un archivo guardado. Estar verdaderamente consciente es que el observador reciba el dato antes de que el ego lo filtre y la amígdala lo juzgue. Alguien te insulta: la consciencia observa ondas sonoras, ve a la amígdala inyectar adrenalina, ve al ego querer defenderse… y decide no hacer nada. Procesaste el dato sin la presión del sistema de supervivencia.</p>
+        <p>No existen las distracciones para la mente, solo las desviaciones. La mente nunca deja de funcionar, ni dormida. Lo único que cambia es a qué programa le mandas el voltaje.</p>
+      </div>
+
+      <div class="callout">
+        Yo creo que los humanos somos el conjunto de ego, consciencia y cuerpo, y encima somos quien observa esos tres y los maneja. Un sistema muy, muy cabrón.
+        <small>Bitácora · sobre el sistema de cuatro piezas</small>
+      </div>
+
+      <div class="next"><button data-go="universo"><span class="k">siguiente</span><span class="t">04 · El universo →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 04 -->
+  <section class="chapter" id="universo" data-world="real">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">04</span>
+      <p class="eyebrow warm">Entrada 04 · Lo real</p>
+      <h1 class="chapter-title">El universo no tiene propósito. <em>Simplemente es.</em></h1>
+      <p class="chapter-lede">Dos matrices corren en paralelo: la Lattice, la materia física donde no existe el vacío, y el hipercampo, toda la data humana acumulada desde el primer ruido que significó "león a la izquierda". Y debajo de ambas, un motor con reglas inmutables.</p>
+    </div>
+
+    <figure class="artefact" data-scene="bigbang">
+      <canvas aria-label="Artefacto: el Big Bang, una singularidad expandiéndose en partículas"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 04</b> · inflación cósmica</span><span>arrastra el deslizador: de la singularidad a las galaxias</span></figcaption>
+      <div class="artefact-controls" style="width:min(320px,60%)"><input type="range" id="bangT" min="0" max="1000" value="1000" aria-label="Tiempo desde el Big Bang"></div>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="block">
+        <h2>Lattice e hipercampo</h2>
+        <p><strong>La Lattice</strong> es el plano físico: el tejido continuo, cuántico, donde no hay espacio vacío. El aire parece transparente pero es un todo denso. Los átomos nunca están quietos; esa vibración es lo que llamamos temperatura. La única forma de detenerla es el cero absoluto. A 37&nbsp;°C, eres una nube compacta de átomos zumbando para no desintegrarte.</p>
+        <p><strong>El hipercampo</strong> (la noosfera, como la llamó Teilhard de Chardin, o el término de Jacobo Grinberg) es el plano mental: la nube de data humana. No existía prefabricado; se fue tejiendo desde el primer sonido con intención de un homínido. Cada conversación, descubrimiento y acuerdo engrosó la red. Los humanos somos los nodos; nuestras interacciones, la fibra óptica del cerebro del planeta.</p>
+        <p>La consciencia es el transductor entre las dos. Las vibraciones del aire son solo presión; los fotones, solo energía electromagnética. El sonido y el color no existen hasta que un cerebro los renderiza. El mundo exterior, en sí mismo, es ciego y silencioso. Y como un motor gráfico que no carga lo que el jugador no mira, tu cuerpo filtra la realidad para no quemar su CPU: no ves átomos, ves formas sólidas para poder operar.</p>
+      </div>
+
+      <div class="block">
+        <h2>Por qué la energía busca el camino fácil</h2>
+        <p>El universo no "quiere" nada. Se rige por pereza termodinámica: el principio de mínima acción. Un resorte apretado requiere tensión; al universo no le gusta la tensión, quiere soltar el resorte. Cuando la energía pura del Big Bang intentó expandirse y enfriarse, la geometría más estable para distribuirse con el menor esfuerzo fue ramificarse. Por eso los rayos, los ríos, tus venas, las ramas de un árbol, las redes de datos y tus neuronas se ven iguales: las redes son la geometría del camino más fácil. El universo le dio copy‑paste al mejor algoritmo de ruteo. Como es arriba, es abajo.</p>
+        <p>Y las reglas son inmutables porque, si cambiaran, no habría universo: sería ruido blanco, clipping perpetuo. El principio antrópico dice que si la gravedad o la fuerza nuclear variaran un 0.00001&nbsp;%, la materia se habría desintegrado al instante. Las reglas son como son porque es el único escenario donde el software arranca sin crashear. No es que el universo esté hecho para nosotros: como decía Alan Watts, así como un manzano da manzanas, la Tierra da humanos. No fuimos puestos sobre el mundo; crecimos desde él.</p>
+      </div>
+
+      <div class="block">
+        <h2>Entropía · el caos que también es equilibrio</h2>
+        <p>Deja caer una gota de tinta en un vaso. Al principio explota en formas violentas; si esperas, el agua queda de un gris uniforme y nada se mueve. Ese estado final, aburrido y muerto, es el equilibrio termodinámico. Para el universo, "equilibrio" significa que la energía se disipó tanto que ya no hay estrellas ni movimiento. Es la muerte térmica.</p>
+        <p>La vida es lo contrario: un resorte que se niega a soltarse. Estar vivo es estar en rebeldía contra la entropía. El 70&nbsp;% de tu energía diaria no se gasta en moverte ni en pensar: se gasta en pagarle un impuesto al universo para que no te disuelva. Bombas en cada membrana sacando sodio y metiendo potasio, fuego interno para mantenerte a 37&nbsp;°C contra un cosmos a −270, enzimas pegando el ADN que se rompe miles de veces al día. Cuando un cuerpo finalmente alcanza el equilibrio perfecto con su entorno, es porque está muerto.</p>
+      </div>
+
+      <div class="canvas-box wide" id="entropyBox">
+        <canvas id="entropy" aria-label="Simulación: una gota de tinta disipándose en agua"></canvas>
+        <div class="bar">
+          <button class="btn" id="entropyDrop">Soltar tinta</button>
+          <button class="btn" id="entropyReset">Reiniciar</button>
+          <span class="read">orden: <span id="entropyRead">100 %</span></span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>El universo de energía cero</h2>
+        <p>¿De dónde salió la energía inicial si antes no había nada? El vacío cuántico no está vacío: partículas virtuales aparecen y se aniquilan constantemente. La hipótesis más sólida de la astrofísica funciona como una inversión de fase en audio. Toma un canal en silencio (0). Manda una onda al izquierdo (+1) y la misma onda invertida al derecho (−1). Cada canal tiene voltaje altísimo; sumados en mono, siguen siendo 0.</p>
+        <p>Toda la masa, la luz y la materia son la energía positiva. Toda la gravedad, que contrae el espacio, es la energía negativa. Sumadas: exactamente cero. El Big Bang no creó energía de la nada; agarró el cero absoluto y lo dividió en dos polaridades. Todo lo que ves es la fricción temporal de esas dos mitades intentando volver a cancelarse.</p>
+      </div>
+
+      <div class="canvas-box wide" id="phaseBox">
+        <canvas id="phase" aria-label="Demostración: dos ondas en fase opuesta que suman cero"></canvas>
+        <div class="bar">
+          <button class="btn" id="phaseInvert" aria-pressed="true">Invertir fase (−1)</button>
+          <span>arriba: +1 · medio: −1 · abajo: suma</span>
+          <span class="read">suma: <span id="phaseRead">0.00</span></span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>El vergazo cósmico</h2>
+        <p>Antes de expandirse, el universo era una singularidad: sin tamaño, sin forma, calor y densidad infinitos. El archivo .zip más inestable de la existencia; y el infinito, en física cuántica, es un error del sistema. La inflación ocurrió entre 10<sup>−36</sup> y 10<sup>−32</sup> segundos, con el espacio mismo estirándose más rápido que la luz. Pero armar cosas tangibles tomó tiempo: 380&nbsp;000 años para que se enfriara lo suficiente y se formaran los primeros átomos de hidrógeno y helio. Dale suficiente tiempo al hidrógeno y eventualmente empezará a preguntarse de dónde vino.</p>
+      </div>
+
+      <div class="block">
+        <h2>Fractales · el copy‑paste del universo</h2>
+        <p>Una nota fundamental en un sintetizador genera armónicos: copias de la onda original oscilando más rápido, más pequeñas. Todo en el universo es un fractal de energía vibrando: la misma ecuación que agrupa polvo estelar en galaxias agrupa sinapsis en pensamientos. Y tus ciclos también: una creencia que se forma en la infancia es la frecuencia fundamental; si no la filtras, el sistema le da copy‑paste y sigue generando bucles en tu vida adulta.</p>
+      </div>
+
+      <div class="canvas-box wide" id="fractalBox">
+        <canvas id="fractal" aria-label="Un árbol fractal creciendo"></canvas>
+        <div class="bar">
+          <label>profundidad <input type="range" id="fractalDepth" min="3" max="11" value="9"></label>
+          <label>ángulo <input type="range" id="fractalAngle" min="10" max="60" value="26"></label>
+          <span class="read">ramas: <span id="fractalRead">—</span></span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Grinberg, Pachita y la modificación de la Lattice</h2>
+        <p>Jacobo Grinberg propuso la Teoría Sintérgica: el cerebro como decodificador de una matriz de información vibratoria. Estudió a Pachita, la chamana que "operaba" con un cuchillo oxidado y materializaba órganos. Lo más probable es que el mecanismo físico fuera ilusionismo en cuartos oscuros con hardware sensorial saturado, y que el resultado —la sanación— fuera real en muchos casos por un placebo extremo: un shock de fe tan profundo que la propia consciencia del paciente obtuvo acceso root a su biología y ordenó la regeneración.</p>
+        <p>Y ahí está la lección que la cultura pop se pierde: no hace falta magia para modificar la Lattice. Los humanos ya somos los modificadores definitivos a través del mundo material. Cuando usas tus manos para producir un álbum, estructurar una empresa o hacer que otra persona sienta nostalgia por una época que no vivió, estás reorganizando físicamente la materia. No cambias el mundo exterior por arte de magia: cambias tu mundo interior y usas la interfaz material para construirlo afuera. Lo "sobrenatural" es solo interfaz avanzada. Lo que para un cavernícola es un milagro, para ti es saber hacer gain staging.</p>
+      </div>
+
+      <div class="callout">
+        Dios es la Lattice y, al mismo tiempo, la consciencia que la observa. En el instante en que la materia pudo mirarse a sí misma, Dios despertó.
+        <small>Bitácora · la ecuación de Dios (materia + observador)</small>
+      </div>
+
+      <div class="next"><button data-go="vida"><span class="k">siguiente</span><span class="t">05 · Vida y muerte →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 05 -->
+  <section class="chapter" id="vida" data-world="real">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">05</span>
+      <p class="eyebrow warm">Entrada 05 · Lo real</p>
+      <h1 class="chapter-title">La vida es la anomalía. La muerte es el universo <em>volviendo a su estado normal</em>.</h1>
+      <p class="chapter-lede">De una rata escondida bajo tierra a un primate que se pregunta qué es la consciencia. Y qué pasa con el hardware, el software y la señal cuando el vaso se rompe.</p>
+    </div>
+
+    <figure class="artefact" data-scene="ocean">
+      <canvas aria-label="Artefacto: una esfera de partículas, el vaso, que se disuelve en un océano"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 05</b> · el vaso y el océano</span><span>toca la escena: la gota regresa al océano y vuelve a subir</span></figcaption>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="block">
+        <h2>Registro del servidor · cómo llegamos aquí</h2>
+        <p>Nunca dejamos de ser primates. Es una muñeca rusa: mamífero → primate → simio sin cola → hominino → Homo sapiens. Eres todos al mismo tiempo. Y no hubo una generación interruptor: la evolución es un error de copiado genético que toma millones de años, donde el entorno decide qué código funciona.</p>
+      </div>
+
+      <div class="evo wide" id="evo">
+        <div class="evo-card"><span class="when">hace 66 M de años</span><h3>El reseteo</h3><p>Cae el asteroide. Los dinosaurios mueren. Sobrevive un mamífero del tamaño de una rata que vivía bajo tierra comiendo insectos: Purgatorius. Nuestro tatara‑abuelo.</p></div>
+        <div class="evo-card"><span class="when">hace 60 M</span><h3>Los primeros primates</h3><p>Esas "ratas" crecen y se suben a los árboles. Ojos al frente para calcular profundidad, pulgares oponibles para agarrarse, uñas planas para sentir en HD.</p></div>
+        <div class="evo-card"><span class="when">hace 6–7 M</span><h3>El primer hominino</h3><p>África se seca, los árboles desaparecen. Nuestro linaje se separa del de los chimpancés. Bajamos al piso. Al principio somos la botana de la sabana.</p></div>
+        <div class="evo-card"><span class="when">hace 4 M</span><h3>Australopithecus</h3><p>"Lucy". Un metro de altura, cerebro de chimpancé, cadera modificada. Caminamos 100&nbsp;% en dos patas: visión de periscopio sobre el pasto y manos libres.</p></div>
+        <div class="evo-card"><span class="when">hace 2.5 M</span><h3>Homo habilis</h3><p>Golpeamos piedras para afilarlas y cortar carne. Nace la primera tecnología del universo.</p></div>
+        <div class="evo-card"><span class="when">hace 1.5 M</span><h3>Homo erectus · el fuego</h3><p>Cocinar predigiere la comida; el intestino se acorta y las calorías sobrantes se van a expandir la corteza prefrontal. Perdemos el pelo, sudamos, cazamos por agotamiento.</p></div>
+        <div class="evo-card"><span class="when">hace 300 000 años</span><h3>Homo sapiens</h3><p>El hardware moderno. Un bebé de entonces criado hoy usaría un iPhone y se preocuparía por las deudas igual que tú. Llevamos 300 000 años con la misma máquina.</p></div>
+        <div class="evo-card"><span class="when">hace 70 000</span><h3>Revolución cognitiva</h3><p>Lenguaje complejo, chisme, mitos compartidos (dioses, dinero, naciones), arte en las paredes. Un pequeño grupo sale de África y puebla el planeta. Todos venimos de ahí.</p></div>
+        <div class="evo-card"><span class="when">hace 10 000</span><h3>Matrix 1</h3><p>Agricultura, sedentarismo, propiedad. El propósito biológico se secuestra hacia jerarquías inventadas.</p></div>
+        <div class="evo-card now"><span class="when">ahora</span><h3>Tú, leyendo esto</h3><p>Un simio africano mutante que se paró en dos patas, hackeó sus calorías con fuego y desarrolló un cerebro capaz de preguntarse por el sentido de la vida frente a un espejo.</p></div>
+      </div>
+
+      <div class="block">
+        <h2>Por qué se dio la consciencia</h2>
+        <p>Es una propiedad emergente, como la humedad: una molécula de agua no está mojada, billones sí. Para sobrevivir en la sabana siendo un mono débil necesitábamos cooperar, y para cooperar necesitábamos simular escenarios: "si le pego a este, la tribu me expulsa y me come el león". El cerebro se volvió tan potente simulando el exterior que en algún momento tuvo RAM suficiente para simularse a sí mismo dentro de su propio mapa. Esa chispa donde el sistema se voltea a verse y dice "yo existo" es la consciencia.</p>
+        <p>Otros animales en manada no llegaron por tres razones: no tenían el fuego para pagar el muro calórico de un cerebro grande; no tenían manos para construir lo que imaginaban (un delfín es brillante y está atrapado en un cuerpo de agua); y no necesitaron el chisme social que exige modelos abstractos de la realidad. Un perro sí piensa y sí siente, anclado al presente perpetuo, sin la carga termodinámica de un ego. Un maestro zen biológico.</p>
+      </div>
+
+      <div class="block">
+        <h2>El terror al vacío · la evolución del software espiritual</h2>
+        <p>Cuando los primeros humanos despertaron, la inmensidad fue aterradora: demasiada información de golpe. Como un sistema de audio con demasiada ganancia, la humanidad temprana necesitó un limitador extremo para no saturarse. El Dios enojado y castigador del Antiguo Testamento fue la mente humana poniéndole paredes a una consciencia que no entendía; era la única forma de darle orden a la tribu. Conforme el hardware maduró, el mensaje cambió hacia el amor y la unidad. Hoy, con la información que tenemos, la consciencia no tiene fronteras: ya no necesitamos un Dios antropomórfico que castigue; entendemos que somos la red misma. Jesús y Buda no eran hijos mágicos del cielo: eran homininos con una corteza prefrontal masiva que apagaron su DMN, entendieron el ciclo de la materia y trataron de explicárselo a simios asustados en la Edad de Bronce. Los simios no entendieron el código, se asustaron y construyeron otra Matrix encima.</p>
+      </div>
+
+      <div class="block">
+        <h2>Qué pasa cuando el juego se acaba</h2>
+      </div>
+
+      <ol class="steps wide">
+        <li class="warm"><div><span class="when">termodinámica</span><h3>El reciclaje del hardware</h3><p>El corazón da el último latido, la placa base se queda sin oxígeno y se apaga. La energía y la materia no se destruyen: tu carbono, tu nitrógeno y tu agua se reintegran a la Tierra. Te conviertes en suelo, en árbol, en oxígeno, en otro animal. Nunca te vas del planeta; tu hardware es desensamblado para construir hardware nuevo.</p></div></li>
+        <li class="alert"><div><span class="when">lo que aterra al 99 %</span><h3>El borrado del software</h3><p>El ego, tu nombre, tus miedos, tu personalidad, son software, y el software necesita un disco físico. Cuando el cerebro se apaga, la carpeta del usuario se elimina para siempre. La gente teme a la muerte porque cree que es ese archivo. El observador sabe que solo era el avatar temporal de esta partida.</p></div></li>
+        <li><div><span class="when">conservación de la información</span><h3>La gota regresa al océano</h3><p>No hay un archivo con tu nombre flotando en el universo; los nombres son un invento de la Matrix. Pero la información no se destruye: se integra. El vaso se rompe, la gota cae al océano de la consciencia y deja de estar separada. No hay un cielo con nubes donde un fantasma toca el arpa: pasas de ser la antena a ser la señal completa.</p></div></li>
+        <li><div><span class="when">el sentido</span><h3>Entonces, ¿para qué la vida?</h3><p>El universo es perfecto, infinito y eterno, y precisamente por eso no puede experimentar nada. La gravedad no puede oler una flor. Para sentirse a sí mismo necesita dividirse en miles de millones de receptores. La vida no es un examen ni un castigo: es el universo poniéndose unas gafas de realidad virtual para experimentar el mundo en 3D. Por eso acarrear leña, sentir miedo, reírte y quebrar empresas importan: esa es la fricción que el universo vino a buscar.</p></div></li>
+      </ol>
+
+      <div class="block">
+        <h2>Cómo se ve la muerte en el cerebro del que se queda</h2>
+        <p>No es un concepto filosófico; es una amputación en la red neuronal y un síndrome de abstinencia. Las neuronas que se disparan juntas se conectan juntas: un padre o una pareja no son un archivo, son parte del sistema operativo. Cuando desaparecen, el mapa predictivo del cerebro deja de coincidir con la realidad y hay que reescribirlo, un proceso que consume cantidades brutales de glucosa (por eso el duelo cansa físicamente). Se corta la fuente de oxitocina y dopamina: abstinencia literal. El cortisol inunda el sistema. Y el dolor se procesa en la misma región que un hueso roto: el corazón roto no es una metáfora para el cerebro.</p>
+        <p>A unos les pega de inmediato y a otros después porque, si el impacto podría causar un colapso, el cerebro activa un cortafuegos: shock, negación, piloto automático para hacer trámites. Libera el dolor a cuentagotas. Las lágrimas emocionales cargan hormonas de estrés y un analgésico natural: llorar es sudar el estrés por los ojos. La tristeza es el cuerpo en modo ahorro de batería para poder reparar el código roto. Para el cosmos la muerte es reciclaje de carbono; para un chico de 17 frente al ataúd de su papá es el vacío absoluto. La verdad sin el momento correcto es solo crueldad disfrazada de inteligencia.</p>
+      </div>
+
+      <div class="callout alert">
+        La muerte es el mejor invento del universo. Si fueras inmortal, esta vida sería una sala de espera. Saber que el avatar es de un solo uso convierte cada café en algo increíblemente valioso.
+        <small>Bitácora · sobre el límite de tiempo</small>
+      </div>
+
+      <div class="next"><button data-go="amor"><span class="k">siguiente</span><span class="t">06 · El amor →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 06 -->
+  <section class="chapter" id="amor" data-world="real">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">06</span>
+      <p class="eyebrow warm">Entrada 06 · Lo real</p>
+      <h1 class="chapter-title">El amor químico une los cuerpos. El amor de consciencia <em>une los mundos</em>.</h1>
+      <p class="chapter-lede">Todo empezó con una pregunta: si nuestro ego es el que se enamora del olor, de la estética, de la química, ¿el amor es puramente química? No lo creo. Si los humanos somos consciencias andantes, somos el cosmos enamorándose de sí mismo.</p>
+    </div>
+
+    <figure class="artefact" data-scene="waves">
+      <canvas aria-label="Artefacto: dos ondas que entran en resonancia o se cancelan"></canvas>
+      <figcaption class="artefact-caption"><span><b>artefacto 06</b> · resonancia</span><span>dos frecuencias: cuando están en fase suman amplitud; cuando no, se desgastan</span></figcaption>
+      <div class="artefact-controls" style="width:min(320px,60%)"><input type="range" id="waveDetune" min="0" max="100" value="12" aria-label="Diferencia entre las dos frecuencias"></div>
+    </figure>
+
+    <div class="chapter-body">
+      <div class="two-worlds wide">
+        <div class="world cold">
+          <p class="eyebrow cold">hardware</p>
+          <h3>Amor de ego</h3>
+          <ul>
+            <li>Un cóctel de dopamina, oxitocina y noradrenalina. Se siente como una adicción.</li>
+            <li>Olor, simetría, estética, y sobre todo cómo esa persona hace sentir a tu ego.</li>
+            <li>Reactivo, intenso, celoso, territorial y diseñado para ser temporal.</li>
+            <li>Su función: que la especie continúe. Nada más.</li>
+          </ul>
+        </div>
+        <div class="world warm">
+          <p class="eyebrow warm">software</p>
+          <h3>Amor de consciencia</h3>
+          <ul>
+            <li>Una decisión activa, no un reflejo involuntario.</li>
+            <li>Reconocer a la otra persona en su totalidad, con luces y sombras.</li>
+            <li>Elegir construir una vida juntos: alinear los días, sostener los proyectos del otro.</li>
+            <li>Dos nodos de consciencia reconociendo que son el mismo Todo y decidiendo ordenar el caos juntos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>El secreto no está en el amor, está en los acuerdos</h2>
+        <p>La psicología comercial te vende cajas: "necesitas a alguien con tu mismo nivel de ambición". No necesariamente. Si yo quiero mil proyectos y mi pareja quiere dedicarse al hogar, y los dos estamos genuinamente felices con eso, ¿quién es la psicología para decir que no hay compatibilidad? Problemas que afrontar va a haber con cualquier persona. Tú eliges con quién resolverlos se hace más fluido. Y si intentas encontrar una visión exactamente igual a la tuya, jamás la vas a encontrar: la consciencia no quiere un eco, quiere expandirse.</p>
+        <p>Sí hay patrones, pero funcionan en dos niveles: similitud en lo macro (valores, dirección de vida) y oposición en lo micro (personalidad, herramientas). Como un buen ecualizador: donde uno recorta, el otro realza. Mirar hacia la misma dirección con distintas herramientas en la mochila.</p>
+      </div>
+
+      <div class="block">
+        <h2>La resta antes de la suma</h2>
+        <p>Para que algo sume tiene que haber una resta. Para aprender tiene que haber un problema. No puedes subir ganancias a lo loco sin saturar la mezcla: primero recortas las frecuencias que chocan. No ganas fuerza sin romper fibras bajo tensión. Todo orden nace del caos. Cuando dicen "conseguite alguien que te sume" están diciendo: conseguite alguien con quien la fricción del día a día, después de procesarla con acuerdos, deje un resultado neto positivo. No se trata de evitar el problema, sino de elegir con quién entrar a la trinchera.</p>
+      </div>
+
+      <div class="block">
+        <h2>La ilusión de la monotonía</h2>
+        <p>El enamoramiento inicial quema todo el CPU: el cerebro al 100&nbsp;% segregando dopamina y noradrenalina. Si te quedaras así para siempre serías un ser humano inservible; no podrías producir, entrenar ni levantar proyectos. Lo que la sociedad llama "aburrimiento" es el ego activando un bypass para ahorrar energía y liberar RAM. Y exactamente ahí, cuando la química se estabiliza, es cuando la consciencia tiene espacio para tomar el control. El amor deja de ser un viaje involuntario y se vuelve la decisión diaria de construir. El mismo principio explica por qué no ves los átomos de la pared de tu cuarto.</p>
+      </div>
+
+      <div class="block">
+        <h2>Monogamia: un constructo, y una elección</h2>
+        <p>Como nómadas no existía la monogamia estricta: parejas que duraban lo que tardaba una cría en caminar, niños criados en comunidad, sin concepto de virginidad ni celos posesivos porque nadie era dueño de nada. La monogamia inquebrantable se inventó con la propiedad privada: sin pruebas de ADN, la única forma de asegurar herederos era controlar la sexualidad de la mujer. Fue un contrato económico, respaldado por la religión para meter miedo.</p>
+        <p>Saber esto no significa acostarte con todo el mundo. Significa que ahora eliges tus reglas. La gente normal es monógama por miedo al infierno o al juicio; el observador puede elegir serle leal a su pareja porque es la jugada más inteligente: concentrar toda su energía, sus recursos y su oxitocina en su ancla en lugar de drenar RAM persiguiendo dopamina barata. Cuando ves el código de la atracción, el juego de seducción se vuelve predecible y por eso mismo pierde la gracia. Ya no buscas compatibilidad geométrica; buscas a alguien con la pantalla de la consciencia encendida. Somos más que sexo. Somos supratrascendentales.</p>
+      </div>
+
+      <div class="block">
+        <h2>Sexo con el ego apagado</h2>
+        <p>El porno es coreografía industrial diseñada para la cámara, no para dos sistemas nerviosos. En la sabana el sexo era vulnerabilidad extrema, por eso el hardware masculino evolucionó para ser rápido; y el femenino no gasta células reproductivas en el clímax, por eso no necesita apagarse. Nada de eso es un fallo. Lo que sí es un bug es tener sexo en tercera persona, con el ego flotando en el techo evaluando el desempeño.</p>
+        <p>Cuando dos humanos conscientes se sincronizan —respiración igualada, contacto visual sostenido, cero prisa, sin la meta del orgasmo como línea de llegada— ocurre acoplamiento neuronal: los latidos se sincronizan, los campos electromagnéticos de los corazones se alinean, el "yo" se disuelve. El control eyaculatorio del que hablan no es magia: es apagar el sistema simpático (acelerador) con respiración lenta y músculos relajados para quedarse en el parasimpático. La monogamia consciente no es una prisión aburrida: es un laboratorio de investigación avanzada sin el ruido de la validación.</p>
+      </div>
+
+      <div class="block">
+        <h2>"La gente hace, no me hace"</h2>
+        <p>La infidelidad no es un problema del que la sufre sino del que la ocasiona: un simio que no controla su hardware cediendo a un pico de dopamina barata por validación externa. No dice nada del valor de su pareja. Y el miedo a que pase, cuando aparece en sueños tres noches seguidas, casi siempre es otra cosa: el vértigo de tu propio cambio proyectado sobre la relación. El control absoluto sobre otra persona es una ilusión física. Lo que sí controlas es no desperdiciar la batería de hoy sufriendo por algo que no existe en el mundo 3D. A lo mucho, se lo cuentas. Abrir tu vulnerabilidad, no acusar.</p>
+        <p>El mejor bio‑hack que existe sigue siendo un abrazo de más de veinte segundos: oxitocina que apaga el cortisol de la amígdala. Si le vas a abrir a alguien la puerta al vacío existencial, tienes que estar dispuesto a sostenerle la mano. Lo más bonito de todo es que no estamos solos: somos millones compartiendo esta existencia rara que no sabemos para qué es.</p>
+      </div>
+
+      <div class="callout">
+        Conseguite alguien que, luego de la fricción del día a día, deje algo en ti.
+        <small>Bitácora · el estándar</small>
+      </div>
+
+      <div class="next"><button data-go="teoria"><span class="k">siguiente</span><span class="t">07 · La Teoría del Todo →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 07 -->
+  <section class="chapter" id="teoria">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">07</span>
+      <p class="eyebrow">Entrada 07 · Síntesis</p>
+      <h1 class="chapter-title">La Teoría del Todo: el orden, el caos y el <em>contagio</em> de la consciencia.</h1>
+      <p class="chapter-lede">No me inventé la rueda. Agarré stems de la física, la neurociencia, el misticismo y la biología, corté las frecuencias basura y los pasé por el master bus. Nadie los había mezclado exactamente así. Diez puntos.</p>
+    </div>
+
+    <div class="chapter-body">
+      <div class="theory wide">
+        <details open>
+          <summary><span class="r">I</span><h3>La estructura dual: Lattice e hipercampo</h3><span class="x">+</span></summary>
+          <div class="body"><p>La realidad opera en dos canales separados pero simultáneos. <strong>La Lattice</strong> es el plano físico: el tejido continuo donde no hay espacio vacío, la materia, los átomos, el mundo que podemos tocar y alterar. <strong>El hipercampo</strong> es el plano mental e inmaterial: toda la data humana, la información, los miedos y los conceptos acumulados como especie desde el primer sonido que hicimos para alertar de un peligro. Lo material y lo construido. Nunca confundirlos.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">II</span><h3>La ecuación divina y el ahorro de energía</h3><span class="x">+</span></summary>
+          <div class="body"><p>Dios no es un individuo en el cielo: es la suma de la Lattice y la consciencia que la observa. Una materia sin quien la decodifique no existe. El universo es hipereficiente: la realidad no se renderiza por completo hasta que se observa, y nuestro cerebro filtra el caos para no quemar su capacidad de procesamiento. No hay señales del universo: hay un Sistema Activador Reticular ejecutando un comando de atención.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">III</span><h3>El sistema operativo humano</h3><span class="x">+</span></summary>
+          <div class="body"><p>Somos una máquina biológica de alta tecnología operada por un usuario central. <strong>Cuerpo</strong> (hardware, reglas medibles). <strong>Ego</strong> (software automático de supervivencia, el empleado más fiel). <strong>Consciencia</strong> (el usuario que decide el propósito). <strong>Observador</strong> (el productor en la silla que decide a qué darle volumen y qué mutear). No somos víctimas de nuestras emociones; somos quien lee el panel.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">IV</span><h3>La evolución histórica del hardware espiritual</h3><span class="x">+</span></summary>
+          <div class="body"><p>Las religiones han sido actualizaciones de software para lidiar con el terror que le daba al humano primitivo enfrentarse a la inmensidad de la consciencia. Pasamos de deidades castigadoras (el limitador) a conceptos de amor universal (la expansión) conforme el cerebro tuvo más capacidad para procesar el Todo. Hoy la consciencia es infinitamente expandible y no necesita paredes de miedo.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">V</span><h3>La fricción y el caos: la resta antes de la suma</h3><span class="x">+</span></summary>
+          <div class="body"><p>El estado original del universo es el caos. Para construir cualquier orden superior se requiere fricción. Los problemas son inevitables; la evolución personal consiste en abrazar esa fricción como el motor que permite construir algo nuevo. Sin resta no hay suma. Sin destrucción no hay tejido nuevo.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">VI</span><h3>La física del amor y el bypass de la monotonía</h3><span class="x">+</span></summary>
+          <div class="body"><p>El enamoramiento inicial requiere demasiada energía biológica. Lo que la sociedad percibe como monotonía es el cuerpo activando un modo de ahorro. Estabilizada la química, la consciencia entra a trabajar y elige a la pareja por los acuerdos y por la fluidez con la que resuelven juntos la fricción de la vida. El amor real no se mide con las variables inmedibles de la psicología comercial.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">VII</span><h3>El juego del universo (Lila) y la limpieza de raíz</h3><span class="x">+</span></summary>
+          <div class="body"><p>El estrés y la ansiedad surgen de tomarnos demasiado en serio a nuestro avatar. Cuando ves el Todo y limpias la raíz existencial, las barreras psicológicas caen solas: ya no necesitas quince plugins para maquillar una señal grabada sucia; grabas limpio desde el inicio. Eres el jugador divirtiéndose, no el personaje sufriendo las reglas.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">VIII</span><h3>La redención del ego</h3><span class="x">+</span></summary>
+          <div class="body"><p>Matar al ego es un error que te desconecta de la realidad material. El ego no es malo: es el gerente operativo que ejecuta y sobrevive de forma implacable. El secreto es que la consciencia tome el puesto de jefe y le dé objetivos de expansión en lugar de dejarlo operar desde el miedo. Y darle descanso cuando ya construyó lo que le pediste.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">IX</span><h3>El falso iluminado y la verdadera espiritualidad</h3><span class="x">+</span></summary>
+          <div class="body"><p>El sabio que se aísla en la montaña no entendió el juego. El verdadero nivel de consciencia es surfear la modernidad: quedarte en la ciudad, usar la tecnología, dominar el sistema financiero y crear riqueza para expandirte, viajar, conocer y aportar a tu tribu. El dinero no es un tabú: es energía material que financia la expansión de la consciencia. El mundo material es el tablero, y jugar bien en él es el acto más elevado de espiritualidad.</p></div>
+        </details>
+        <details>
+          <summary><span class="r">X</span><h3>La modificación material de la Lattice</h3><span class="x">+</span></summary>
+          <div class="body"><p>Nos obsesionamos con capacidades místicas ocultas, pero el ser humano ya es el modificador definitivo de la Lattice a través del mundo material. Cuando usas tus manos para crear una empresa, estructurar un proyecto o producir un álbum de la nada, estás reorganizando físicamente la materia. Ya tenemos las herramientas instaladas; actuar en lo físico es nuestro superpoder. Y el único que existe.</p></div>
+        </details>
+      </div>
+
+      <div class="block">
+        <h2>Cómo se demuestra</h2>
+        <p>No se demuestra en un laboratorio. La prueba es el nivel de operatividad: si este sistema te permite dominar tu ego, hackear tu biología, no ahogarte en las crisis que hunden a la mayoría y levantar tus proyectos con claridad, funciona en la práctica. Qué más prueba que nuestra propia vida. El Lila no se explica ni se cuenta: se descubre. Y aunque yo saliera mañana a gritarlo, el Lila sigue. No intento enseñarle nada a nadie. Pero la información está aquí para el que la busque.</p>
+        <p>Si tuviera que ponerle etiquetas a esta forma de pensar: pensamiento de primeros principios (reducir todo a la física y la evolución y reconstruir desde ahí), naturalismo pragmático (solo existe el mundo físico, y esa crudeza se usa para vivir mejor, no para deprimirse) y psicología evolutiva. El superpoder es unir varias fuentes y sacar tus propias conclusiones; ninguna fuente sola tiene la razón, todas son distintos puntos de verdad.</p>
+      </div>
+
+      <div class="next"><button data-go="manual"><span class="k">siguiente</span><span class="t">08 · Manual de operación →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 08 -->
+  <section class="chapter" id="manual">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">08</span>
+      <p class="eyebrow">Entrada 08 · Práctica</p>
+      <h1 class="chapter-title">Antes de la iluminación, cortar leña. Después de la iluminación, <em>cortar leña</em>.</h1>
+      <p class="chapter-lede">Entender la Matrix es el paso uno. El tablero es físico, y si no mueves las piezas el sistema te aplasta. El universo no deposita dinero por ser el mono más despierto de la sabana. Esto es qué hacer el lunes por la mañana.</p>
+    </div>
+
+    <div class="chapter-body">
+      <div class="block">
+        <h2>Zen urbano</h2>
+        <p>El mundo perfecto no cambia lo que hacemos sino cómo lo hacemos y desde dónde. La sociedad siempre va a necesitar plomeros, ingenieros y productores; el error es creer que despertar te exime de la labor material. La diferencia radical está en la consciencia detrás de la acción: hacerlo con presencia, exigiendo intercambios justos, sin que tu paz dependa de la fricción del entorno. El sistema industrial no es el enemigo: es doloroso, costó mucha sangre, y hoy es una máquina autosuficiente que sostiene a miles de millones de avatares. No pelees contra el motor; aprende a conducirlo.</p>
+        <h3>La única revolución que vale: la educación</h3>
+        <p>Si el sistema industrial se queda, el cambio va en la educación. Borrar el modelo prusiano de empleados obedientes y reemplazarlo por un escáner de talentos que potencie la naturaleza de cada individuo en lugar de medir a un pez por su habilidad para trepar árboles. Ecosistemas multigeneracionales: separar humanos estrictamente por su año de fabricación es antinatural; los jóvenes inyectan procesamiento, los mayores aportan optimización.</p>
+      </div>
+
+      <div class="block">
+        <h2>La fórmula, cruda</h2>
+        <ol>
+          <li><strong>Asegurar el hardware.</strong> Saciar las necesidades biológicas reales: techo, comida, salud, seguridad para ti y tu tribu. Sin eso no se dispara la consciencia; ni siquiera se piensa en ella. Ahí la pobreza es atrozmente física y los gurús que dicen "es mental" mienten.</li>
+          <li><strong>Desinstalar los depredadores imaginarios.</strong> Con el estómago lleno, la Matrix te inventa amenazas: estatus, marcas, títulos. Ahí sí, la pobreza es 100&nbsp;% mental.</li>
+          <li><strong>Autoeducarte en tu propia existencia,</strong> no en temas de la Matrix. Usar la RAM sobrante para entender tu biología, tu ego y el universo.</li>
+        </ol>
+        <p>El resto es contenido extra para divertirse.</p>
+      </div>
+
+      <div class="block">
+        <h2>Cuándo empujar y cuándo descansar</h2>
+        <p>Audita quién pone la resistencia. Si el hardware está al 100&nbsp;% (dormiste, comiste, estás en paz) y no quieres trabajar porque prefieres dopamina barata, es el ego: sacas el látigo y fuerzas la fricción. Si no quieres ni la dopamina barata, sientes un peso físico, niebla y cero ganas de interactuar, es el hardware sin combustible: empujar ahí no crece nada, funde el motor. El descanso que repara se siente como ganas de volver a construir; el letargo se siente aguado. Y el humano no está hecho para estar acostado: el descanso real es activo, caminar al sol, cocinar, hablar, cambiar de actividad sin apagar el sistema. Por eso regresas de vacaciones más cansado: tu cerebro entró en modo ahorro absoluto.</p>
+        <p>La verdadera productividad humana es por objetivos, no por tiempo: entrenas una hora para encender el reactor, te sientas dos o tres horas con el teléfono apagado, matas el mamut del día y te desconectas sin culpa. La ansiedad que sientes por no generar recursos no es la Matrix regañándote: es tu instinto sonando la alarma porque tu seguridad depende de otro miembro de la tribu. Y vender —salir de la cueva con tu lanza— dispara el terror al exilio aunque sepas que un "no" es solo un dato estadístico.</p>
+      </div>
+
+      <div class="rule wide"><span class="eyebrow warm">protocolo de arranque · día 1</span></div>
+
+      <ol class="steps wide">
+        <li class="warm"><div><span class="when">07:00 – 08:00 · encendido</span><h3>Nada de pantalla, nada de nicotina</h3><p>Vaso grande de agua. Luz del sol directo en los ojos quince minutos para frenar la melatonina. Ayuno táctico: solo agua o café negro para que la sangre se quede en la corteza prefrontal.</p></div></li>
+        <li class="warm"><div><span class="when">08:00 – 08:30 · sin volumen basura</span><h3>No acomodes el escritorio</h3><p>Cambiar el logo, ordenar carpetas y leer otro libro de mentalidad es evasión vestida de productividad. La computadora se abre con un solo objetivo biológico: cazar.</p></div></li>
+        <li class="warm"><div><span class="when">08:30 – 10:00 · colapso de la onda</span><h3>Tira las lanzas</h3><p>Cinco prospectos hiperespecíficos. Un mensaje que le diga a su SARA cómo le ahorras calorías, estrés y dinero. Enviar cinco veces. Observa el pico de adrenalina, sonríe sabiendo que es un rezago evolutivo, y hazlo igual.</p></div></li>
+        <li class="warm"><div><span class="when">10:00 en adelante · desconexión</span><h3>Cierra el correo</h3><p>No recargues la página esperando la validación de la tribu. Si dicen sí, hay recursos. Si dicen no, su servidor no daba la talla para tu software. Luego, cortar leña: gimnasio, comida real, la tribu.</p></div></li>
+      </ol>
+
+      <div class="rule wide"><span class="eyebrow warm">caja de herramientas</span></div>
+
+      <div class="tools wide">
+        <div class="tool"><span class="k">hardware</span><h3>Fricción física</h3><p>Caminar veinte minutos o flexiones hasta que el corazón lata fuerte. Le dice al cerebro "no estamos enfermos, estamos cazando" y la niebla se disipa. El flujo óptico de caminar apaga el sistema simpático solo.</p></div>
+        <div class="tool"><span class="k">hardware</span><h3>Ayuno 16/8</h3><p>El cronómetro empieza en el último bocado y el sueño cuenta. Cena a las 8, duerme, y solo tienes que aguantar hasta el mediodía. La creatina es combustible real para las neuronas; el pre‑workout es veneno para el sistema nervioso.</p></div>
+        <div class="tool"><span class="k">química</span><h3>Reconstruir dopamina y serotonina</h3><p>Aburrimiento estratégico (el celular en otro cuarto), triptófano (huevos, pollo, salmón, nueces, plátano con carbohidrato complejo), sol quince minutos, y micro‑victorias: caza hormigas antes que elefantes.</p></div>
+        <div class="tool"><span class="k">tribu</span><h3>El abrazo de veinte segundos</h3><p>Oxitocina que suprime el cortisol de inmediato. Cuando sientas que te vuelves loco, abraza a alguien: el cuerpo físico es el cable a tierra. La consciencia pura no cura la soledad; la tribu sí.</p></div>
+        <div class="tool"><span class="k">social</span><h3>Volverte bilingüe</h3><p>En la mesa del domingo la gente hace grooming de primates: chismes, viajes, clima. El contenido no importa; el mensaje es "somos de la misma tribu". No estás ahí para educarlos. Si te chingan: exagera y confirma, o sonríe y sigue comiendo.</p></div>
+        <div class="tool"><span class="k">social</span><h3>Seleccionar a quién despertar</h3><p>Morfeo no convencía gente al azar: solo abría la puerta a quien ya estaba golpeando. La pastilla se transfiere por demanda o por compatibilidad extrema. Si se la das a alguien sin ancla, lo dejas en caída libre. Al resto, déjalos dormir; es su simulación.</p></div>
+        <div class="tool"><span class="k">liquidez</span><h3>Capital muerto</h3><p>Cuando la alarma de supervivencia grita, resuelve el micro‑problema de hoy, no el macro‑problema de tu vida. Un activo sin usar es energía congelada. El evaluador de la casa de empeño es un personaje sin importancia; tu ego temiendo la humillación es el único muro.</p></div>
+        <div class="tool"><span class="k">contagio</span><h3>Resonancia, no sermones</h3><p>El lenguaje fue inventado por el ego para advertir de tigres; es inútil para explicar el Todo. La única forma de enseñar es convertirte en la enseñanza: vivir tan claro que quien se acerque se contagie por ósmosis. El arte es el vehículo que salta la lógica.</p></div>
+      </div>
+
+      <div class="block">
+        <h2>Generador binaural · underclocking del ego</h2>
+        <p>Dos ondas senoidales puras, una en cada oído, con una diferencia de 4.5&nbsp;Hz. El choque no ocurre en el aire: ocurre en el complejo olivar superior de tu tallo cerebral, que intenta resolver la diferencia de fase y renderiza un pulso fantasma. Por frecuencia de arrastre, tus ondas cerebrales imitan ese ritmo y bajan de Beta (alerta, estrés) a la frontera Theta/Delta, donde la DMN reduce su actividad. No la apaga: le baja el voltaje. Un colchón de ruido rosa distribuye la energía por toda la cóclea para que las senoidales no te dejen ese zumbido seco.</p>
+        <p>Base C3 (65.41&nbsp;Hz) contra 69.91&nbsp;Hz: +115 cents, calculado con la fórmula 1200 × log₂(f₂/f₁). Volumen ridículamente bajo. Y la única regla que hay que dejar clara: <strong>solo funciona con audífonos.</strong> En una bocina las ondas chocan en el aire y solo escuchas un trémolo físico.</p>
+      </div>
+
+      <div class="binaural wide" id="binaural">
+        <div class="binaural-head">
+          <div><p class="eyebrow warm">artefacto 08 · parche clínico</p><p class="binaural-warn">usar audífonos · volumen bajo · no mientras manejas</p></div>
+          <button class="btn" id="binPlay">▶ Iniciar</button>
+        </div>
+        <div class="binaural-scope"><canvas id="binScope" aria-label="Osciloscopio de las dos ondas"></canvas></div>
+        <div class="binaural-grid">
+          <div class="binaural-ctl"><label for="binBeat"><span>diferencia (pulso)</span><b id="binBeatV">4.5 Hz</b></label><input type="range" id="binBeat" min="0.5" max="12" step="0.1" value="4.5"></div>
+          <div class="binaural-ctl"><label for="binBase"><span>nota base</span><b id="binBaseV">C3 · 65.41 Hz</b></label><input type="range" id="binBase" min="0" max="3" step="1" value="0"></div>
+          <div class="binaural-ctl"><label for="binNoise"><span>ruido rosa (colchón)</span><b id="binNoiseV">35 %</b></label><input type="range" id="binNoise" min="0" max="100" value="35"></div>
+          <div class="binaural-ctl"><label for="binVol"><span>volumen general</span><b id="binVolV">25 %</b></label><input type="range" id="binVol" min="0" max="100" value="25"></div>
+        </div>
+        <div class="binaural-read">
+          <div>oído izquierdo <b id="binL">65.41 Hz</b></div>
+          <div>oído derecho <b id="binR">69.91 Hz</b></div>
+          <div>desafinación <b id="binCents">+115 cents</b></div>
+        </div>
+        <div class="brain-waves" id="brainWaves">
+          <div data-w="delta">Delta 0.5–4 · sueño, regeneración</div>
+          <div data-w="theta">Theta 4–8 · meditación, creatividad</div>
+          <div data-w="alpha">Alfa 8–12 · relajado</div>
+          <div data-w="beta">Beta 13–30 · alerta, estrés</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        Toda esta energía y claridad tiene que ser canalizada en fricción física en el mundo real. La filosofía sin ejecución es chaqueta mental.
+        <small>Bitácora · regla del arquitecto</small>
+      </div>
+
+      <div class="next"><button data-go="bitacora"><span class="k">siguiente</span><span class="t">09 · Bitácora →</span></button></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 09 -->
+  <section class="chapter" id="bitacora">
+    <div class="chapter-head">
+      <span class="chapter-index" aria-hidden="true">09</span>
+      <p class="eyebrow">Entrada 09 · Archivo</p>
+      <h1 class="chapter-title">Entradas que sobrevivieron <em>al proceso</em>.</h1>
+      <p class="chapter-lede">Frases que salieron entre un velorio, un gimnasio, un parque de noche y una llamada larga. No están ordenadas por importancia; están ordenadas por el momento en que se cayó la venda.</p>
+    </div>
+
+    <div class="chapter-body">
+      <ol class="log wide">
+        <li><span class="n">entrada 001</span><div><blockquote>Si los humanos somos consciencias andantes, somos el cosmos enamorándose de sí mismo.</blockquote><p class="ctx">La primera. Resuena con Sagan: somos una forma de que el cosmos se conozca a sí mismo.</p></div></li>
+        <li><span class="n">entrada 002</span><div><blockquote>El secreto del amor está en los acuerdos, no en el amor.</blockquote><p class="ctx">Problemas va a haber con cualquier persona. Eliges con quién resolverlos se hace más fluido.</p></div></li>
+        <li><span class="n">entrada 003</span><div><blockquote>El factor que siempre olvidamos es la resta antes de la suma.</blockquote><p class="ctx">Tiene que haber caos antes de que algo se construya. Entropía aplicada a las relaciones.</p></div></li>
+        <li><span class="n">entrada 004</span><div><blockquote>Una materia que no tiene quien la vea no existe en ningún lado.</blockquote><p class="ctx">Por eso Dios nació en el momento en que nació la consciencia.</p></div></li>
+        <li><span class="n">entrada 005</span><div><blockquote>La única forma de enseñarle algo a alguien es contagiándoselo, viviéndolo tú en tu vida.</blockquote><p class="ctx">El lenguaje fue inventado para advertir de tigres. No sirve para explicar el Todo.</p></div></li>
+        <li><span class="n">entrada 006</span><div><blockquote>El ego es nuestro empleado más fiel: no le importa si le pagamos cinco quetzales, va todos los días puntual.</blockquote><p class="ctx">No hay que matarlo. Hay que dirigirlo.</p></div></li>
+        <li><span class="n">entrada 007</span><div><blockquote>La vida es tan hermosa que la mayoría nunca la disfruta por el miedo paralizante de llegar al final y darse cuenta de que no la supo disfrutar.</blockquote><p class="ctx">Una profecía autocumplida: el miedo a desperdiciarla es lo que la desperdicia.</p></div></li>
+        <li><span class="n">entrada 008</span><div><blockquote>El ego es la mayor fricción entre la Lattice y el humano porque el ego es la forma en la que modificamos la Lattice. No necesitamos otra.</blockquote><p class="ctx">Cuando se apaga la DMN se apaga el Windows: la interfaz de modificación.</p></div></li>
+        <li><span class="n">entrada 009</span><div><blockquote>El único superpoder que un ser vivo puede tener es el que tenemos: interactuar con la materia. Y cuando le sumas consciencia: abstracción absoluta y orden absoluto juntos.</blockquote><p class="ctx">Los superpoderes de las películas son un capricho infantil para evitar el trabajo.</p></div></li>
+        <li><span class="n">entrada 010</span><div><blockquote>No existen las distracciones para la mente, solo las desviaciones.</blockquote><p class="ctx">La mente no deja de funcionar ni dormida. Solo cambia a qué le mandas el voltaje.</p></div></li>
+        <li><span class="n">entrada 011</span><div><blockquote>Lo agobiante no es que el cerebro no pueda procesar el cosmos. Es tener la tolerancia de aguantar estar en la Matrix aun conociendo la verdad del cosmos.</blockquote><p class="ctx">Si el cerebro no estuviera hecho para pensar en esto, no pensaría en esto.</p></div></li>
+        <li><span class="n">entrada 012</span><div><blockquote>La información siempre ha estado ahí. Nadie la oculta, pero nadie la regala.</blockquote><p class="ctx">Dicho en una cena, hablando de tierraplanistas, sin entrar al debate.</p></div></li>
+        <li><span class="n">entrada 013</span><div><blockquote>La gente hace, no me hace.</blockquote><p class="ctx">Si alguien falla, es un error en su código de control de impulsos. No una devaluación tuya.</p></div></li>
+        <li><span class="n">entrada 014</span><div><blockquote>Te veo.</blockquote><p class="ctx">Ya no ves amenazas ni gente lenta. Ves primates hermosos y asustados corriendo el software que les instalaron.</p></div></li>
+        <li><span class="n">entrada 015</span><div><blockquote>Lo más bonito de todo es que no estamos solos: somos millones compartiendo esta existencia rara que no sabemos para qué es.</blockquote><p class="ctx">Lo que le dije a mi novia cuando lloró. El ancla más potente que existe.</p></div></li>
+        <li><span class="n">entrada 016</span><div><blockquote>Somos como hormigas cuando les machucan el hormiguero: los terremotos son de la materia de la Tierra, pero nosotros los sentimos como ataque personal porque nos creemos dueños de ella.</blockquote><p class="ctx">Dicho en una cena. Nadie reaccionó. Ese día entendí lo del pantallazo azul doble.</p></div></li>
+        <li><span class="n">entrada 017</span><div><blockquote>Ser consciente te hace responsable. El que no es consciente actúa según su ignorancia; el que lo es ya no puede jugar a hacerse el tonto.</blockquote><p class="ctx">La maldición y la bendición de tragarse la pastilla.</p></div></li>
+        <li><span class="n">entrada 018</span><div><blockquote>Este fuego interno no va a arder toda la vida. Hay que aprovecharlo para construir cada imperio que yo quiera y desvelarme cada noche que yo quiera construyéndolo.</blockquote><p class="ctx">Ventanas cuánticas. Y saber que a los 25 el cemento de la corteza prefrontal se seca; mejor que se seque alrededor de esto.</p></div></li>
+        <li><span class="n">entrada 019</span><div><blockquote>Dani, uno en la vida piensa en el trabajo, en la relación, en la sociedad… ¿pero alguna vez te has parado un segundo y pensado en cómo se siente estar vivo?</blockquote><p class="ctx">La pregunta perfecta. El Ctrl+Alt+Supr del cerebro humano. Rompe la cuarta pared del teatro.</p></div></li>
+        <li><span class="n">entrada 020</span><div><blockquote>El día que yo me muera, estas personas podrán decir "él me liberó". Esa es mi misión: hacerle un poco de bien a la humanidad.</blockquote><p class="ctx">Transmitir genes o transmitir ideas. El cuerpo caduca; el código no.</p></div></li>
+      </ol>
+
+      <div class="block">
+        <h2>Los que pensaron antes</h2>
+        <p>Nadie lo empaquetó con exactamente estos ingredientes, pero cada pieza tiene dueño. Estos son los stems.</p>
+      </div>
+
+      <div class="thinkers wide">
+        <div class="thinker"><h3>Baruch Spinoza</h3><p class="k">siglo XVII · panteísmo</p><p>Dios no es un señor barbudo: Dios es la naturaleza y el universo mismo. Lo llamaron hereje. Describió la Lattice y la consciencia como una sola cosa.</p></div>
+        <div class="thinker"><h3>Jacobo Grinberg</h3><p class="k">neurofisiología · teoría sintérgica</p><p>La Lattice, el hipercampo, el cerebro como decodificador de una matriz de información. Desapareció en 1994. Brillante, y buscando desesperadamente que la magia fuera real.</p></div>
+        <div class="thinker"><h3>Alan Watts</h3><p class="k">filosofía · Lila</p><p>El universo es un juego y el propósito no es llegar a un destino sino bailar mientras suena la música. Como un manzano da manzanas, la Tierra da humanos.</p></div>
+        <div class="thinker"><h3>Marco Aurelio</h3><p class="k">estoicismo · Meditaciones</p><p>El hombre más poderoso del mundo recordándose cada día que era un primate, que la muerte es reciclaje de átomos y que no vale enojarse por la estupidez ajena.</p></div>
+        <div class="thinker"><h3>Buda</h3><p class="k">el primer hacker documentado</p><p>Un príncipe que lo tenía todo, se dio cuenta de que era una ilusión que generaba sufrimiento, apagó su ego y enseñó a despertar. Buda significa exactamente eso: el que despertó.</p></div>
+        <div class="thinker"><h3>Eckhart Tolle</h3><p class="k">El poder del ahora</p><p>Su mente colapsó una noche a los 29 y el ego se desintegró. Escribió el manual moderno para apagar la Red Neuronal por Defecto. Le falta la física y la fricción necesaria.</p></div>
+        <div class="thinker"><h3>Helen Fisher</h3><p class="k">neurociencia del amor</p><p>Mapeó el cerebro enamorado en tres sistemas: lujuria, atracción, apego. Describió el software del ego sin dar el salto a la consciencia.</p></div>
+        <div class="thinker"><h3>Carl Jung</h3><p class="k">psicología profunda</p><p>Las relaciones como alquimia: dos sustancias que, si reaccionan, se transforman. Entendió el caos y la destrucción antes de la creación.</p></div>
+        <div class="thinker"><h3>Ken Wilber</h3><p class="k">teoría integral</p><p>Intentó unir ciencia occidental, biología, psicología del ego y misticismo oriental en un solo mapa de la consciencia.</p></div>
+        <div class="thinker"><h3>Erwin Schrödinger</h3><p class="k">¿Qué es la vida?</p><p>La vida como entropía negativa: un resorte que se niega a soltarse, pagándole impuestos al universo para no disolverse.</p></div>
+        <div class="thinker"><h3>Terence McKenna</h3><p class="k">la teoría del mono dopado</p><p>Los hongos psilocibios como catalizador del lenguaje y la consciencia. El fuego armó la computadora; los hongos quizá iniciaron el primer modo admin.</p></div>
+        <div class="thinker"><h3>Roberto Pérez · Chystemc</h3><p class="k">los traductores</p><p>Uno explica el Lila con vocabulario católico para que la amígdala latinoamericana no entre en pánico. El otro resumió la teoría entera en barras: "no lo olvidaste por error, fue control".</p></div>
+      </div>
+
+      <div class="callout">
+        Que loco estar vivo. Todo es tan simple, pero infinito. Nos dieron la interfaz perfecta para procesar de manera simple lo complejo del universo.
+        <small>Bitácora · última entrada por ahora</small>
+      </div>
+
+      <div class="next"><button data-go="inicio"><span class="k">volver</span><span class="t">00 · Wake up ↺</span></button></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <b>Bitácora de un Observador</b> · Fabio Iván Castañeda Fuentes · Guatemala<br>
+    Un archivo vivo. Física, biología y neurociencia en palabras humanas; ninguna fuente tiene toda la razón, todas son puntos de verdad.<br>
+    El generador binaural y las simulaciones corren en tu navegador. Nada se envía a ningún lado.
+  </footer>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* =====================================================================
+   Bitácora de un Observador — artefactos (Three.js r128 + canvas 2D)
+   Un solo artefacto activo a la vez; el resto duerme.
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HAS_THREE = typeof THREE !== 'undefined';
+  var COLORS = { warm: 0xe2a85a, cold: 0x5ec1d9, ink: 0xe9e4d8, alert: 0xd97a6c, dim: 0x736f66 };
+
+  var registry = {};
+  var instances = {};       // sceneName -> instance
+  var activeName = null;
+  var rafId = null;
+  var lastT = 0;
+  var params = { bangT: 1, waveDetune: 0.12 };
+
+  /* ---------- utilidades ---------- */
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function randDir() { var z = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, r = Math.sqrt(1 - z * z); return new THREE.Vector3(r * Math.cos(a), r * Math.sin(a), z); }
+  function sizeCanvas(canvas) {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.floor(r.width)), h = Math.max(1, Math.floor(r.height));
+    return { w: w, h: h, dpr: dpr };
+  }
+  function makeRenderer(canvas) {
+    var r = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    r.setClearColor(0x000000, 0);
+    return r;
+  }
+  function pointerTracker(canvas) {
+    var p = { x: 0, y: 0, inside: false, sx: 0, sy: 0 };
+    function set(e) {
+      var r = canvas.getBoundingClientRect();
+      var cx = (e.touches ? e.touches[0].clientX : e.clientX);
+      var cy = (e.touches ? e.touches[0].clientY : e.clientY);
+      p.sx = cx - r.left; p.sy = cy - r.top;
+      p.x = (p.sx / r.width) * 2 - 1;
+      p.y = -((p.sy / r.height) * 2 - 1);
+      p.inside = true;
+    }
+    canvas.addEventListener('pointermove', set);
+    canvas.addEventListener('pointerdown', set);
+    canvas.addEventListener('pointerleave', function () { p.inside = false; });
+    return p;
+  }
+
+  /* =====================================================================
+     00 · LATTICE — red de puntos que responde al observador
+     ===================================================================== */
+  registry.lattice = function (canvas) {
+    var renderer = makeRenderer(canvas);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 200);
+    camera.position.set(0, 0, 26);
+    var N = 17, spacing = 1.15, count = N * N * N;
+    var base = new Float32Array(count * 3), pos = new Float32Array(count * 3), col = new Float32Array(count * 3);
+    var i = 0, off = (N - 1) / 2;
+    var cw = new THREE.Color(COLORS.warm), cc = new THREE.Color(COLORS.ink);
+    for (var x = 0; x < N; x++) for (var y = 0; y < N; y++) for (var z = 0; z < N; z++) {
+      base[i * 3] = (x - off) * spacing; base[i * 3 + 1] = (y - off) * spacing; base[i * 3 + 2] = (z - off) * spacing;
+      var m = Math.random();
+      var c = m < 0.85 ? cc : cw;
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+      i++;
+    }
+    pos.set(base);
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    var mat = new THREE.PointsMaterial({ size: 0.11, vertexColors: true, transparent: true, opacity: 0.85, sizeAttenuation: true, depthWrite: false });
+    var points = new THREE.Points(geo, mat);
+    var group = new THREE.Group(); group.add(points); scene.add(group);
+    group.rotation.x = 0.35; group.rotation.y = 0.6;
+    var ptr = pointerTracker(canvas);
+    var ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3(), target = new THREE.Vector3(999, 999, 0), inv = new THREE.Matrix4();
+    return {
+      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      update: function (t, dt) {
+        group.rotation.y += dt * 0.05;
+        group.rotation.x = 0.35 + Math.sin(t * 0.1) * 0.15;
+        if (ptr.inside) {
+          ray.setFromCamera({ x: ptr.x, y: ptr.y }, camera);
+          plane.normal.set(0, 0, 1).applyQuaternion(group.quaternion);
+          if (ray.ray.intersectPlane(plane, hit)) { inv.copy(group.matrixWorld).invert(); hit.applyMatrix4(inv); target.lerp(hit, 0.15); }
+        } else { target.lerp(new THREE.Vector3(999, 999, 0), 0.02); }
+        var p = geo.attributes.position.array;
+        for (var k = 0; k < count; k++) {
+          var bx = base[k * 3], by = base[k * 3 + 1], bz = base[k * 3 + 2];
+          var breathe = Math.sin(t * 0.8 + bx * 0.4 + by * 0.3 + bz * 0.2) * 0.12;
+          var dx = bx - target.x, dy = by - target.y, dz = bz - target.z;
+          var d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          var ripple = Math.sin(d * 1.6 - t * 4) * Math.exp(-d * 0.28) * 1.1;
+          var s = 1 + breathe * 0.1 + ripple * 0.12;
+          p[k * 3] = bx * s; p[k * 3 + 1] = by * s; p[k * 3 + 2] = bz * s;
+        }
+        geo.attributes.position.needsUpdate = true;
+        renderer.render(scene, camera);
+      },
+      dispose: function () { geo.dispose(); mat.dispose(); renderer.dispose(); }
+    };
+  };
+
+  /* =====================================================================
+     01 · CAGE — barrotes que se disuelven donde miras
+     ===================================================================== */
+  registry.cage = function (canvas) {
+    var renderer = makeRenderer(canvas);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 1.5, 16);
+    var group = new THREE.Group(); scene.add(group);
+    var bars = [], BAR = 44, R = 5.2, H = 7;
+    for (var i = 0; i < BAR; i++) {
+      var a = (i / BAR) * Math.PI * 2;
+      var g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(Math.cos(a) * R, -H / 2, Math.sin(a) * R), new THREE.Vector3(Math.cos(a) * R, H / 2, Math.sin(a) * R)]);
+      var m = new THREE.LineBasicMaterial({ color: COLORS.cold, transparent: true, opacity: 0.7 });
+      var line = new THREE.Line(g, m); line.userData.a = a; group.add(line); bars.push(line);
+    }
+    var rings = [];
+    [-H / 2, 0, H / 2].forEach(function (y) {
+      var pts = [];
+      for (var k = 0; k <= 96; k++) { var a = (k / 96) * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * R, y, Math.sin(a) * R)); }
+      var rg = new THREE.BufferGeometry().setFromPoints(pts);
+      var rl = new THREE.Line(rg, new THREE.LineBasicMaterial({ color: COLORS.cold, transparent: true, opacity: 0.35 }));
+      group.add(rl); rings.push(rl);
+    });
+    // el observador: una nube cálida en el centro
+    var n = 500, arr = new Float32Array(n * 3);
+    for (var j = 0; j < n; j++) { var v = randDir().multiplyScalar(Math.pow(Math.random(), 0.5) * 1.6); arr[j * 3] = v.x; arr[j * 3 + 1] = v.y; arr[j * 3 + 2] = v.z; }
+    var pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+    var cloud = new THREE.Points(pg, new THREE.PointsMaterial({ color: COLORS.warm, size: 0.08, transparent: true, opacity: 0.9, depthWrite: false }));
+    group.add(cloud);
+    var ptr = pointerTracker(canvas), tmp = new THREE.Vector3(), w = 1, h = 1;
+    return {
+      resize: function (W, H2, dpr) { w = W; h = H2; renderer.setPixelRatio(dpr); renderer.setSize(W, H2, false); camera.aspect = W / H2; camera.updateProjectionMatrix(); },
+      update: function (t, dt) {
+        group.rotation.y += dt * 0.12;
+        cloud.rotation.y -= dt * 0.3; cloud.rotation.x += dt * 0.1;
+        cloud.material.size = 0.08 + Math.sin(t * 2) * 0.02;
+        for (var i = 0; i < bars.length; i++) {
+          var b = bars[i];
+          tmp.set(Math.cos(b.userData.a) * R, 0, Math.sin(b.userData.a) * R).applyMatrix4(group.matrixWorld).project(camera);
+          var sx = (tmp.x + 1) / 2 * w, sy = (1 - tmp.y) / 2 * h;
+          var front = tmp.z < 0.985 ? 1 : 0.35;
+          var target = 0.75 * front;
+          if (ptr.inside) {
+            var d = Math.hypot(sx - ptr.sx, sy - ptr.sy);
+            var fade = Math.max(0, 1 - d / 140);
+            target *= (1 - fade * 0.97);
+          }
+          b.material.opacity += (target - b.material.opacity) * Math.min(1, dt * 6);
+        }
+        renderer.render(scene, camera);
+      },
+      dispose: function () { renderer.dispose(); }
+    };
+  };
+
+  /* =====================================================================
+     02 · NEURONS — red que dispara pulsos
+     ===================================================================== */
+  registry.neurons = function (canvas) {
+    var renderer = makeRenderer(canvas);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 0, 17);
+    var group = new THREE.Group(); scene.add(group);
+    var N = 260, nodes = [];
+    for (var i = 0; i < N; i++) {
+      var v = randDir().multiplyScalar(Math.pow(Math.random(), 0.45) * 7.5);
+      v.x *= 1.5; nodes.push(v);
+    }
+    var edges = [];
+    for (i = 0; i < N; i++) {
+      var d = [];
+      for (var j = 0; j < N; j++) if (j !== i) d.push([nodes[i].distanceTo(nodes[j]), j]);
+      d.sort(function (a, b) { return a[0] - b[0]; });
+      var k = 2 + (Math.random() < 0.4 ? 1 : 0);
+      for (var q = 0; q < k; q++) if (d[q][1] > i) edges.push([i, d[q][1]]); else if (Math.random() < 0.5) edges.push([i, d[q][1]]);
+    }
+    var npos = new Float32Array(N * 3), ncol = new Float32Array(N * 3), heat = new Float32Array(N);
+    for (i = 0; i < N; i++) { npos[i * 3] = nodes[i].x; npos[i * 3 + 1] = nodes[i].y; npos[i * 3 + 2] = nodes[i].z; }
+    var ng = new THREE.BufferGeometry(); ng.setAttribute('position', new THREE.BufferAttribute(npos, 3)); ng.setAttribute('color', new THREE.BufferAttribute(ncol, 3));
+    var nodesObj = new THREE.Points(ng, new THREE.PointsMaterial({ size: 0.16, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false }));
+    group.add(nodesObj);
+    var E = edges.length, epos = new Float32Array(E * 6), ecol = new Float32Array(E * 6);
+    for (i = 0; i < E; i++) { var a = nodes[edges[i][0]], b = nodes[edges[i][1]]; epos.set([a.x, a.y, a.z, b.x, b.y, b.z], i * 6); }
+    var eg = new THREE.BufferGeometry(); eg.setAttribute('position', new THREE.BufferAttribute(epos, 3)); eg.setAttribute('color', new THREE.BufferAttribute(ecol, 3));
+    var lines = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.55 }));
+    group.add(lines);
+    var P = 120, pulses = [], ppos = new Float32Array(P * 3);
+    for (i = 0; i < P; i++) pulses.push({ e: Math.floor(Math.random() * E), t: Math.random(), s: rand(0.4, 1.1) });
+    var pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(ppos, 3));
+    var pulsesObj = new THREE.Points(pg, new THREE.PointsMaterial({ color: COLORS.warm, size: 0.14, transparent: true, opacity: 1, depthWrite: false }));
+    group.add(pulsesObj);
+    var cDim = new THREE.Color(0x3a4150), cHot = new THREE.Color(COLORS.warm), cEdge = new THREE.Color(0x2a3140), tmpc = new THREE.Color();
+    var ptr = pointerTracker(canvas);
+    return {
+      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      update: function (t, dt) {
+        group.rotation.y += dt * 0.08 + (ptr.inside ? ptr.x * dt * 0.4 : 0);
+        group.rotation.x = lerp(group.rotation.x, ptr.inside ? -ptr.y * 0.35 : Math.sin(t * 0.2) * 0.15, dt * 2);
+        for (var i = 0; i < N; i++) { heat[i] *= (1 - dt * 2.2); if (Math.random() < dt * 0.35) heat[i] = 1; }
+        for (i = 0; i < N; i++) { tmpc.copy(cDim).lerp(cHot, heat[i]); ncol[i * 3] = tmpc.r; ncol[i * 3 + 1] = tmpc.g; ncol[i * 3 + 2] = tmpc.b; }
+        ng.attributes.color.needsUpdate = true;
+        for (i = 0; i < E; i++) {
+          var h = Math.max(heat[edges[i][0]], heat[edges[i][1]]) * 0.8;
+          tmpc.copy(cEdge).lerp(cHot, h);
+          ecol[i * 6] = tmpc.r; ecol[i * 6 + 1] = tmpc.g; ecol[i * 6 + 2] = tmpc.b; ecol[i * 6 + 3] = tmpc.r; ecol[i * 6 + 4] = tmpc.g; ecol[i * 6 + 5] = tmpc.b;
+        }
+        eg.attributes.color.needsUpdate = true;
+        for (i = 0; i < P; i++) {
+          var p = pulses[i]; p.t += dt * p.s;
+          if (p.t >= 1) { heat[edges[p.e][1]] = 1; p.t = 0; p.e = Math.floor(Math.random() * E); }
+          var a = nodes[edges[p.e][0]], b = nodes[edges[p.e][1]];
+          ppos[i * 3] = lerp(a.x, b.x, p.t); ppos[i * 3 + 1] = lerp(a.y, b.y, p.t); ppos[i * 3 + 2] = lerp(a.z, b.z, p.t);
+        }
+        pg.attributes.position.needsUpdate = true;
+        renderer.render(scene, camera);
+      },
+      dispose: function () { renderer.dispose(); }
+    };
+  };
+
+  /* =====================================================================
+     03 · RINGS — cuerpo · ego · consciencia · observador
+     ===================================================================== */
+  registry.rings = function (canvas) {
+    var renderer = makeRenderer(canvas);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 2, 18);
+    var group = new THREE.Group(); scene.add(group);
+    var defs = [
+      { r: 2.2, color: COLORS.warm, n: 260, speed: [0.6, 0.2, 0.4], size: 0.11 },   // cuerpo
+      { r: 3.6, color: COLORS.cold, n: 420, speed: [-0.3, 0.5, 0.1], size: 0.09 },  // ego
+      { r: 5.1, color: COLORS.ink, n: 600, speed: [0.2, -0.25, 0.3], size: 0.07 },  // consciencia
+      { r: 6.7, color: COLORS.dim, n: 800, speed: [-0.1, 0.12, -0.2], size: 0.05 }  // observador
+    ];
+    var rings = defs.map(function (d) {
+      var arr = new Float32Array(d.n * 3);
+      for (var i = 0; i < d.n; i++) {
+        var a = (i / d.n) * Math.PI * 2, jitter = (Math.random() - 0.5) * 0.25;
+        arr[i * 3] = Math.cos(a) * (d.r + jitter); arr[i * 3 + 1] = (Math.random() - 0.5) * 0.15; arr[i * 3 + 2] = Math.sin(a) * (d.r + jitter);
+      }
+      var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+      var pts = new THREE.Points(g, new THREE.PointsMaterial({ color: d.color, size: d.size, transparent: true, opacity: 0.9, depthWrite: false }));
+      var holder = new THREE.Group(); holder.add(pts); holder.rotation.set(Math.random(), Math.random(), Math.random());
+      group.add(holder); return { obj: holder, d: d };
+    });
+    // el observador: un punto central quieto
+    var core = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3)), new THREE.PointsMaterial({ color: COLORS.ink, size: 0.35, transparent: true, opacity: 1 }));
+    group.add(core);
+    var ptr = pointerTracker(canvas);
+    return {
+      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      update: function (t, dt) {
+        rings.forEach(function (r) { r.obj.rotation.x += r.d.speed[0] * dt; r.obj.rotation.y += r.d.speed[1] * dt; r.obj.rotation.z += r.d.speed[2] * dt; });
+        group.rotation.y = lerp(group.rotation.y, ptr.inside ? ptr.x * 0.5 : 0, dt * 2);
+        group.rotation.x = lerp(group.rotation.x, ptr.inside ? -ptr.y * 0.3 : 0.2, dt * 2);
+        core.material.size = 0.3 + Math.sin(t * 1.5) * 0.08;
+        renderer.render(scene, camera);
+      },
+      dispose: function () { renderer.dispose(); }
+    };
+  };
+
+  /* =====================================================================
+     04 · BIGBANG — de la singularidad a las galaxias (params.bangT 0..1)
+     ===================================================================== */
+  registry.bigbang = function (canvas) {
+    var renderer = makeRenderer(canvas);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+    camera.position.set(0, 6, 30);
+    camera.lookAt(0, 0, 0);
+    var N = 9000, G = 7, centers = [];
+    for (var g = 0; g < G; g++) centers.push(new THREE.Vector3(rand(-14, 14), rand(-5, 5), rand(-14, 14)));
+    var finalPos = new Float32Array(N * 3), dir = new Float32Array(N * 3), pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+    var cw = new THREE.Color(COLORS.warm), cc = new THREE.Color(COLORS.cold), ci = new THREE.Color(COLORS.ink), tmp = new THREE.Color();
+    for (var i = 0; i < N; i++) {
+      var c = centers[i % G];
+      var a = Math.random() * Math.PI * 2, r = Math.pow(Math.random(), 0.6) * 4.5, arm = Math.floor(Math.random() * 2) * Math.PI;
+      var x = c.x + Math.cos(a + arm + r * 0.9) * r, z = c.z + Math.sin(a + arm + r * 0.9) * r, y = c.y + (Math.random() - 0.5) * (0.8 - r * 0.1);
+      finalPos[i * 3] = x; finalPos[i * 3 + 1] = y; finalPos[i * 3 + 2] = z;
+      var d = randDir(); dir[i * 3] = d.x; dir[i * 3 + 1] = d.y; dir[i * 3 + 2] = d.z;
+      tmp.copy(i % G % 3 === 0 ? cc : cw).lerp(ci, Math.random() * 0.6);
+      col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+    }
+    var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    var mat = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
+    var points = new THREE.Points(geo, mat); scene.add(points);
+    var ptr = pointerTracker(canvas);
+    return {
+      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      update: function (t, dt) {
+        var T = params.bangT; // 0..1
+        var e = ease(Math.min(1, T * 1.15));
+        var burst = Math.min(1, T * 6);            // inflación: los primeros milisegundos
+        var p = geo.attributes.position.array;
+        for (var i = 0; i < N; i++) {
+          var bx = dir[i * 3] * 9 * burst, by = dir[i * 3 + 1] * 9 * burst, bz = dir[i * 3 + 2] * 9 * burst;
+          p[i * 3] = lerp(bx, finalPos[i * 3], e); p[i * 3 + 1] = lerp(by, finalPos[i * 3 + 1], e); p[i * 3 + 2] = lerp(bz, finalPos[i * 3 + 2], e);
+        }
+        geo.attributes.position.needsUpdate = true;
+        mat.size = lerp(0.35, 0.09, e); mat.opacity = lerp(1, 0.85, e);
+        points.rotation.y += dt * 0.04;
+        camera.position.x = lerp(camera.position.x, ptr.inside ? ptr.x * 6 : 0, dt);
+        camera.position.y = lerp(camera.position.y, 6 + (ptr.inside ? ptr.y * 3 : 0), dt);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      },
+      dispose: function () { renderer.dispose(); }
+    };
+  };
+
+  /* =====================================================================
+     05 · OCEAN — el vaso (esfera) que regresa al océano (plano)
+     ===================================================================== */
+  registry.ocean = function (canvas) {
+    var renderer = makeRenderer(canvas);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 5, 17); camera.lookAt(0, 0, 0);
+    var N = 5200, sph = new Float32Array(N * 3), sea = new Float32Array(N * 3), pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+    var W = 22;
+    for (var i = 0; i < N; i++) {
+      var v = randDir().multiplyScalar(2.6 * Math.pow(Math.random(), 0.3));
+      sph[i * 3] = v.x; sph[i * 3 + 1] = v.y + 2.2; sph[i * 3 + 2] = v.z;
+      sea[i * 3] = rand(-W / 2, W / 2); sea[i * 3 + 1] = -2.5; sea[i * 3 + 2] = rand(-W / 2, W / 2);
+    }
+    var cw = new THREE.Color(COLORS.warm), cc = new THREE.Color(COLORS.cold), tmp = new THREE.Color();
+    var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    var mat = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
+    scene.add(new THREE.Points(geo, mat));
+    var morph = 0, target = 0, flip = function () { target = target > 0.5 ? 0 : 1; };
+    canvas.addEventListener('pointerdown', flip);
+    var ptr = pointerTracker(canvas), spin = 0;
+    return {
+      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      update: function (t, dt) {
+        morph += (target - morph) * Math.min(1, dt * 1.4);
+        var m = ease(Math.max(0, Math.min(1, morph)));
+        var p = geo.attributes.position.array;
+        spin += dt * 0.25;
+        for (var i = 0; i < N; i++) {
+          var sx = sph[i * 3], sy = sph[i * 3 + 1], sz = sph[i * 3 + 2];
+          var rx = sx * Math.cos(spin) - sz * Math.sin(spin), rz = sx * Math.sin(spin) + sz * Math.cos(spin);
+          var ox = sea[i * 3], oz = sea[i * 3 + 2];
+          var oy = -2.5 + Math.sin(ox * 0.6 + t * 1.2) * 0.25 + Math.cos(oz * 0.5 + t * 0.9) * 0.25;
+          var drop = Math.sin(m * Math.PI) * 1.2 * (i % 7 === 0 ? 1 : 0.3);
+          p[i * 3] = lerp(rx, ox, m); p[i * 3 + 1] = lerp(sy, oy, m) - drop; p[i * 3 + 2] = lerp(rz, oz, m);
+          tmp.copy(cw).lerp(cc, m);
+          col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+        }
+        geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
+        camera.position.x = lerp(camera.position.x, ptr.inside ? ptr.x * 4 : 0, dt);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      },
+      dispose: function () { renderer.dispose(); }
+    };
+  };
+
+  /* =====================================================================
+     06 · WAVES — resonancia (canvas 2D)
+     ===================================================================== */
+  registry.waves = function (canvas) {
+    var ctx = canvas.getContext('2d'), w = 1, h = 1, dpr = 1;
+    return {
+      resize: function (W, H, D) { w = W; h = H; dpr = D; canvas.width = W * D; canvas.height = H * D; ctx.setTransform(D, 0, 0, D, 0, 0); },
+      update: function (t) {
+        ctx.clearRect(0, 0, w, h);
+        var detune = params.waveDetune; // 0..1
+        var f1 = 3, f2 = 3 + detune * 3;
+        var amp = h * 0.11;
+        function wave(y0, fn, color, width) {
+          ctx.beginPath(); ctx.lineWidth = width; ctx.strokeStyle = color;
+          for (var x = 0; x <= w; x += 2) { var y = y0 + fn(x / w); x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+          ctx.stroke();
+        }
+        var ph = t * 1.4;
+        var s1 = function (u) { return Math.sin(u * Math.PI * 2 * f1 - ph) * amp; };
+        var s2 = function (u) { return Math.sin(u * Math.PI * 2 * f2 - ph * (f2 / f1)) * amp; };
+        ctx.strokeStyle = 'rgba(233,228,216,0.08)'; ctx.lineWidth = 1;
+        [0.28, 0.5, 0.78].forEach(function (k) { ctx.beginPath(); ctx.moveTo(0, h * k); ctx.lineTo(w, h * k); ctx.stroke(); });
+        wave(h * 0.28, s1, 'rgba(226,168,90,0.9)', 1.5);
+        wave(h * 0.5, s2, 'rgba(94,193,217,0.9)', 1.5);
+        wave(h * 0.78, function (u) { return (s1(u) + s2(u)) * 0.9; }, 'rgba(233,228,216,0.95)', 2.2);
+        ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(115,111,102,1)';
+        ctx.fillText('yo · ' + f1.toFixed(2) + ' Hz', 16, h * 0.28 - amp - 10);
+        ctx.fillText('la otra persona · ' + f2.toFixed(2) + ' Hz', 16, h * 0.5 - amp - 10);
+        var label = detune < 0.06 ? 'resonancia: las amplitudes se suman' : detune < 0.45 ? 'fricción: hay batimiento, hay acuerdos por hacer' : 'cancelación: la energía se anula';
+        ctx.fillText('suma · ' + label, 16, h * 0.78 - amp * 1.8 - 10);
+      },
+      dispose: function () {}
+    };
+  };
+
+  /* =====================================================================
+     gestor
+     ===================================================================== */
+  function figureFor(name) { return document.querySelector('.artefact[data-scene="' + name + '"]'); }
+
+  function ensure(name) {
+    if (instances[name]) return instances[name];
+    var fig = figureFor(name); if (!fig) return null;
+    var canvas = fig.querySelector('canvas');
+    var factory = registry[name]; if (!factory) return null;
+    if (name !== 'waves' && !HAS_THREE) { fig.classList.add('is-static'); return null; }
+    var inst;
+    try { inst = factory(canvas); } catch (e) { fig.classList.add('is-static'); return null; }
+    inst.canvas = canvas; inst.fig = fig;
+    var s = sizeCanvas(canvas); inst.resize(s.w, s.h, s.dpr);
+    if (window.ResizeObserver) new ResizeObserver(function () { var s2 = sizeCanvas(canvas); inst.resize(s2.w, s2.h, s2.dpr); if (REDUCED) inst.update(1, 0); }).observe(fig);
+    instances[name] = inst;
+    return inst;
+  }
+
+  function loop(now) {
+    rafId = null;
+    var inst = activeName && instances[activeName]; if (!inst) return;
+    var t = now / 1000, dt = Math.min(0.05, t - (lastT || t)); lastT = t;
+    if (document.visibilityState === 'visible') inst.update(t, dt);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  window.Scenes = {
+    params: params,
+    activate: function (name) {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      activeName = null;
+      if (!name) return;
+      var inst = ensure(name); if (!inst) return;
+      activeName = name; lastT = 0;
+      if (REDUCED) { inst.fig.classList.add('is-static'); inst.update(2, 0); return; }
+      rafId = requestAnimationFrame(loop);
+    },
+    sceneOf: function (chapterEl) { var f = chapterEl && chapterEl.querySelector('.artefact[data-scene]'); return f ? f.getAttribute('data-scene') : null; }
+  };
+})();
+
+</script>
+<script>
+/* =====================================================================
+   Bitácora de un Observador — interacciones
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* =====================================================================
+     Navegación por capítulos
+     ===================================================================== */
+  var chapters = $$('.chapter');
+  var STATUS = { inicio: 'observando', matrix: 'leyendo el código', hardware: 'auditando el chasis', software: 'modo admin', universo: 'zoom out', vida: 'reciclando materia', amor: 'en resonancia', teoria: 'compilando', manual: 'cortando leña', bitacora: 'archivando' };
+  var current = null;
+  var ticker = { fns: [], id: null, active: null };
+
+  function go(id, opts) {
+    opts = opts || {};
+    var target = document.getElementById(id);
+    if (!target || !target.classList.contains('chapter')) return;
+    if (current === id && !opts.force) { if (!opts.noScroll) scrollTop(); return; }
+    current = id;
+    chapters.forEach(function (c) { c.classList.toggle('is-active', c.id === id); });
+    $$('[data-go]').forEach(function (b) {
+      if (b.classList.contains('rail-btn')) { if (b.getAttribute('data-go') === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
+    });
+    var rb = $('.rail-btn[data-go="' + id + '"]');
+    if (rb && rb.scrollIntoView && window.innerWidth < 1040) rb.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    $('#status').textContent = STATUS[id] || 'observando';
+    if (!opts.noHash) { try { history.replaceState(null, '', '#' + id); } catch (e) {} }
+    if (!opts.noScroll) scrollTop();
+    ticker.active = id;
+    if (window.Scenes) window.Scenes.activate(window.Scenes.sceneOf(target));
+    if (id === 'universo') playBang();
+    if (id !== 'manual' && binaural.playing) binaural.stop();
+    document.title = (id === 'inicio' ? '' : (target.querySelector('.rail-btn') ? '' : '')) + 'Bitácora de un Observador';
+  }
+  function scrollTop() { window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }); }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-go]'); if (!b) return;
+    e.preventDefault(); go(b.getAttribute('data-go'));
+  });
+  window.addEventListener('hashchange', function () { var id = location.hash.replace('#', ''); if (id) go(id, { noHash: true }); });
+
+  /* =====================================================================
+     Ticker para lienzos 2D (solo corre el capítulo activo)
+     ===================================================================== */
+  function tick(now) {
+    ticker.id = null;
+    var any = false;
+    ticker.fns.forEach(function (f) { if (f.chapter === ticker.active || f.always) { f.fn(now / 1000); any = true; } });
+    ticker.id = requestAnimationFrame(tick);
+  }
+  function addTick(chapter, fn, always) { ticker.fns.push({ chapter: chapter, fn: fn, always: !!always }); }
+  function fit2d(canvas) {
+    var r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.floor(r.width)), h = Math.max(1, Math.floor(r.height));
+    if (canvas.width !== w * dpr || canvas.height !== h * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
+    var ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  /* =====================================================================
+     00 · texto escrito
+     ===================================================================== */
+  (function typed() {
+    var el = $('#typed'); if (!el) return;
+    var lines = ['wake up, observador…', 'the matrix has you.', 'sigue al conejo blanco.', 'knock, knock.', 'estás vivo. lo sabes.'];
+    if (REDUCED) { el.textContent = lines[4]; return; }
+    var li = 0, ci = 0, del = false;
+    function step() {
+      var s = lines[li];
+      if (!del) { ci++; el.textContent = s.slice(0, ci); if (ci === s.length) { del = true; return setTimeout(step, 1700); } return setTimeout(step, 45 + Math.random() * 50); }
+      ci--; el.textContent = s.slice(0, ci);
+      if (ci === 0) { del = false; li = (li + 1) % lines.length; return setTimeout(step, 500); }
+      setTimeout(step, 22);
+    }
+    setTimeout(step, 600);
+  })();
+
+  /* =====================================================================
+     01 · pastillas
+     ===================================================================== */
+  (function pills() {
+    var out = $('#pillOut'); if (!out) return;
+    var TXT = {
+      blue: '<p class="eyebrow cold">pastilla azul · aceptada</p><p>Sistema estable. El drama de la tribu sigue siendo el centro del universo. Tus problemas importan porque el ego necesita que importen. El semáforo rojo es una ley cósmica, el likes cuenta como estatus, y mañana hay que ir a la oficina.</p><p>Es comodísima: si te va mal es culpa del gobierno, de la industria o de la mala suerte. Nadie te pide que muevas piezas. Puedes volver a dormir.</p>',
+      red: '<p class="eyebrow alert">pastilla roja · procesando</p><p>Vas a temblar. Vas a querer despertar a todos para no sentirte solo, y nadie te va a entender la primera vez. Vas a mirar a tu familia en la mesa y ver primates intercambiando sonidos para confirmar que son de la misma tribu. Vas a sentir un duelo por tu antigua identidad.</p><p>Y después, ligereza. Los obstáculos se vuelven bugs técnicos en vez de dramas emocionales. La consciencia te hace 100&nbsp;% responsable: ya no puedes hacerte el tonto. Pero tampoco necesitas que nadie lo entienda para que sea real.</p>'
+    };
+    $$('.pill-btn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        $$('.pill-btn').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
+        b.setAttribute('aria-pressed', 'true');
+        out.innerHTML = TXT[b.getAttribute('data-pill')];
+      });
+    });
+  })();
+
+  /* =====================================================================
+     02 · mapa del cerebro
+     ===================================================================== */
+  (function brain() {
+    var detail = $('#brainDetail'); if (!detail) return;
+    var DATA = {
+      rep: { h: 'Cerebro reptiliano · el BIOS', p: 'Tallo cerebral y cerebelo, en la nuca. Mantiene la máquina encendida: respiración, latidos, equilibrio, digestión. Código puro de supervivencia que compartimos con los lagartos. Cero consciencia, cero emociones. Aquí vive el SARA, la aduana que filtra el 99&nbsp;% de la realidad.' },
+      lim: { h: 'Sistema límbico · el usuario estándar', p: 'La amígdala (tu radar de amenazas, la que te hace temblar y dispara cortisol), el hipocampo (el disco duro de la memoria) y el hipotálamo (la fábrica química: hambre, temperatura, impulso sexual). Es la Matrix emocional: instinto de tribu, validación social, ego primitivo. La parte que quiere impresionar a los demás y que te levanta de la cama a medianoche con dopamina.' },
+      neo: { h: 'Neocórtex · alta resolución', p: 'La capa gris y arrugada que cubre todo lo demás, el 80&nbsp;% del cerebro. Procesa lenguaje, visión, oído y razonamiento general. Aquí se renderiza la interfaz simplificada del mundo: colores y formas sólidas en lugar de átomos y vacío, para que puedas operar sin quemar el CPU.' },
+      pre: { h: 'Corteza prefrontal · modo admin', p: 'Justo detrás de la frente. La estructura más nueva de la evolución; termina de mielinizarse alrededor de los 25 años. Aquí ocurre el libre albedrío, la planificación, la filosofía. Es la única estructura capaz de hackear al sistema límbico: cuando la amígdala entra en pánico, la corteza prefrontal la observa, la neutraliza y ordena un abrazo para inyectar oxitocina. Pesa el 2&nbsp;% del cuerpo y cobra el 20&nbsp;% de la energía.' }
+    };
+    function pick(id) {
+      $$('.brain-svg .region').forEach(function (r) { r.classList.toggle('is-on', r.getAttribute('data-region') === id); });
+      $$('#brainList button').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-region') === id); });
+      detail.innerHTML = '<h3>' + DATA[id].h + '</h3><p>' + DATA[id].p + '</p>';
+    }
+    $$('.brain-svg .region, #brainList button').forEach(function (el) { el.addEventListener('click', function () { pick(el.getAttribute('data-region')); }); });
+    pick('pre');
+  })();
+
+  /* =====================================================================
+     02 · reloj de ayuno
+     ===================================================================== */
+  (function fasting() {
+    var r = $('#fastRange'); if (!r) return;
+    var out = $('#fastH'), desc = $('#fastDesc'), phases = $$('.fast-phase');
+    var TXT = [
+      function (h) { return '<b>Procesamiento activo.</b> Estómago e intestino a tope, insulina alta. Cero ayuno real: pura digestión. La sangre está en la panza, no en la corteza prefrontal.'; },
+      function (h) { return '<b>Vaciando el tanque.</b> La digestión mecánica terminó. El cuerpo consume el azúcar (glucógeno) almacenada en el hígado y los músculos. El cosquilleo que sientes es ghrelina por costumbre; desaparece en veinte minutos si la ignoras.'; },
+      function (h) { return '<b>Modo admin metabólico.</b> Se acabó el azúcar del hígado. Insulina al mínimo, RAM digestiva liberada, el cuerpo quema grasa y produce cetonas (combustible premium para las neuronas). Empieza la autofagia: recicla células viejas y proteínas rotas. El rango perfecto para tener la mañana afilada sin perder masa muscular.'; },
+      function (h) { return h >= 72 ? '<b>Línea roja.</b> Más de 72 horas el ayuno deja de ser un hack y es una emergencia: el cortisol se dispara y el sistema empieza a canibalizar músculo para fabricar glucosa. Aquí se termina el experimento.' : '<b>Reseteo profundo.</b> Cetosis total, pico de autofagia, el sistema inmune se reinicia. Ocasional, no diario, y con electrolitos (sodio, potasio, magnesio) en el agua para que el corazón y el cerebro no pierdan conductividad.'; }
+    ];
+    function update() {
+      var h = +r.value; out.textContent = h;
+      var idx = h < 4 ? 0 : h < 12 ? 1 : h < 24 ? 2 : 3;
+      phases.forEach(function (p, i) { p.classList.toggle('is-on', i === idx); p.classList.toggle('was', i < idx); });
+      desc.innerHTML = TXT[idx](h);
+    }
+    r.addEventListener('input', update); update();
+  })();
+
+  /* =====================================================================
+     03 · administrador de tareas (RAM)
+     ===================================================================== */
+  (function ram() {
+    var box = $('#ram'); if (!box) return;
+    var ranges = $$('input[type="range"]', box), ego = $('#ramEgo'), free = $('#ramFree'), pct = $('#ramPct'), msg = $('#ramMsg');
+    function update() {
+      var sum = 0;
+      ranges.forEach(function (r) { sum += +r.value; $('.val[data-for="' + r.id + '"]', box).textContent = r.value + ' %'; });
+      var used = Math.min(100, Math.round(sum / ranges.length * 1.15));
+      var libre = 100 - used;
+      ego.style.width = used + '%'; free.style.width = libre + '%';
+      pct.textContent = libre + ' %';
+      msg.textContent = libre < 15 ? 'El antivirus consume todo el procesador. El observador sigue ahí, pero sin ancho de banda: reaccionas en piloto automático y cualquier cosa se siente como un ataque.'
+        : libre < 40 ? 'El ego todavía manda. Puedes ver el problema desde afuera a ratos, pero cuesta cerrar ventanas. Aquí no se resuelve la vida a las once de la noche.'
+        : libre < 70 ? 'Hay espacio. La consciencia ocupa lo que el ego suelta. Empiezas a observar tus propias alarmas sin obedecerlas.'
+        : 'RAM liberada. No es que fabriques más consciencia: es que dejaste de gastarla defendiendo una imagen. Aquí se toman las decisiones del arquitecto.';
+    }
+    ranges.forEach(function (r) { r.addEventListener('input', update); }); update();
+  })();
+
+  /* =====================================================================
+     04 · big bang (deslizador) + animación automática
+     ===================================================================== */
+  var bang = { touched: false, anim: null };
+  (function bangInit() {
+    var s = $('#bangT'); if (!s) return;
+    s.addEventListener('input', function () { bang.touched = true; if (window.Scenes) window.Scenes.params.bangT = +s.value / 1000; });
+    s.addEventListener('pointerdown', function () { bang.touched = true; if (bang.anim) cancelAnimationFrame(bang.anim); });
+  })();
+  function playBang() {
+    var s = $('#bangT'); if (!s || bang.touched || REDUCED) return;
+    var t0 = performance.now(), D = 7000;
+    function f(now) { var k = Math.min(1, (now - t0) / D); s.value = Math.round(k * 1000); if (window.Scenes) window.Scenes.params.bangT = k; if (k < 1) bang.anim = requestAnimationFrame(f); }
+    s.value = 0; if (window.Scenes) window.Scenes.params.bangT = 0;
+    bang.anim = requestAnimationFrame(f);
+  }
+
+  /* =====================================================================
+     04 · entropía (tinta en agua)
+     ===================================================================== */
+  (function entropy() {
+    var c = $('#entropy'); if (!c) return;
+    var N = 1400, P = [], dropped = false, read = $('#entropyRead');
+    function reset() { P = []; dropped = false; for (var i = 0; i < N; i++) { var a = Math.random() * Math.PI * 2, r = Math.random() * 6; P.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, vx: 0, vy: 0 }); } read.textContent = '100 %'; }
+    $('#entropyDrop').addEventListener('click', function () { if (!dropped) { dropped = true; P.forEach(function (p) { var a = Math.random() * Math.PI * 2, s = 20 + Math.random() * 60; p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s; }); } });
+    $('#entropyReset').addEventListener('click', reset);
+    reset();
+    var last = 0;
+    addTick('universo', function (t) {
+      var f = fit2d(c), ctx = f.ctx, w = f.w, h = f.h, dt = Math.min(0.05, t - (last || t)); last = t;
+      ctx.fillStyle = '#11141b'; ctx.fillRect(0, 0, w, h);
+      var cx = w / 2, cy = h / 2, sum = 0, maxR = Math.min(w, h) / 2;
+      for (var i = 0; i < N; i++) {
+        var p = P[i];
+        if (dropped) {
+          p.vx += (Math.random() - 0.5) * 120 * dt; p.vy += (Math.random() - 0.5) * 120 * dt;
+          p.vx *= 0.995; p.vy *= 0.995;
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          if (p.x < -w / 2 + 4) { p.x = -w / 2 + 4; p.vx *= -0.9; } if (p.x > w / 2 - 4) { p.x = w / 2 - 4; p.vx *= -0.9; }
+          if (p.y < -h / 2 + 4) { p.y = -h / 2 + 4; p.vy *= -0.9; } if (p.y > h / 2 - 4) { p.y = h / 2 - 4; p.vy *= -0.9; }
+        } else { p.x += Math.sin(t * 2 + i) * 0.05; p.y += Math.cos(t * 1.7 + i) * 0.05; }
+        sum += Math.min(1, Math.hypot(p.x, p.y) / maxR);
+        ctx.fillStyle = 'rgba(94,193,217,0.55)'; ctx.fillRect(cx + p.x, cy + p.y, 2, 2);
+      }
+      var order = Math.max(0, Math.round((1 - sum / N / 0.62) * 100));
+      read.textContent = order + ' %';
+      ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(115,111,102,1)';
+      ctx.fillText(dropped ? (order < 10 ? 'equilibrio termodinámico: nada se mueve, todo es gris. muerte térmica.' : 'la tinta no quiere pintar el agua. es estadística: hay trillones de estados desordenados y uno ordenado.') : 'una gota concentrada = energía bajo tensión (baja entropía)', 14, h - 14);
+    });
+  })();
+
+  /* =====================================================================
+     04 · energía cero (inversión de fase)
+     ===================================================================== */
+  (function phase() {
+    var c = $('#phase'); if (!c) return;
+    var inv = true, btn = $('#phaseInvert'), read = $('#phaseRead');
+    btn.addEventListener('click', function () { inv = !inv; btn.setAttribute('aria-pressed', String(inv)); btn.classList.toggle('is-on', inv); btn.textContent = inv ? 'Invertir fase (−1)' : 'Misma fase (+1)'; });
+    btn.classList.add('is-on');
+    addTick('universo', function (t) {
+      var f = fit2d(c), ctx = f.ctx, w = f.w, h = f.h; ctx.clearRect(0, 0, w, h);
+      var amp = h * 0.1, ph = REDUCED ? 0 : t * 2;
+      function wave(y0, fn, color) { ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.6; for (var x = 0; x <= w; x += 2) { var y = y0 + fn(x / w); x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+      ctx.strokeStyle = 'rgba(233,228,216,0.08)'; [0.25, 0.5, 0.8].forEach(function (k) { ctx.beginPath(); ctx.moveTo(0, h * k); ctx.lineTo(w, h * k); ctx.stroke(); });
+      var s1 = function (u) { return Math.sin(u * Math.PI * 2 * 3 - ph) * amp; };
+      var s2 = function (u) { return (inv ? -1 : 1) * Math.sin(u * Math.PI * 2 * 3 - ph) * amp; };
+      wave(h * 0.25, s1, 'rgba(226,168,90,0.95)'); wave(h * 0.5, s2, 'rgba(94,193,217,0.95)'); wave(h * 0.8, function (u) { return s1(u) + s2(u); }, 'rgba(233,228,216,1)');
+      ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(115,111,102,1)';
+      ctx.fillText('materia, luz, calor  (+1)', 14, h * 0.25 - amp - 8); ctx.fillText(inv ? 'gravedad  (−1)' : 'otra onda igual  (+1)', 14, h * 0.5 - amp - 8); ctx.fillText(inv ? 'suma = 0 · el universo no creó energía: dividió el cero' : 'suma = 2 · así NO funciona el universo', 14, h * 0.8 - amp * 2 - 8);
+      read.textContent = inv ? '0.00' : '2.00';
+    });
+  })();
+
+  /* =====================================================================
+     04 · fractal
+     ===================================================================== */
+  (function fractal() {
+    var c = $('#fractal'); if (!c) return;
+    var depthEl = $('#fractalDepth'), angEl = $('#fractalAngle'), read = $('#fractalRead');
+    addTick('universo', function (t) {
+      var f = fit2d(c), ctx = f.ctx, w = f.w, h = f.h; ctx.clearRect(0, 0, w, h);
+      var depth = +depthEl.value, ang = +angEl.value * Math.PI / 180, sway = REDUCED ? 0 : Math.sin(t * 0.7) * 0.03, n = 0;
+      function branch(x, y, len, a, d) {
+        if (d === 0 || len < 1.2) return; n++;
+        var x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
+        var k = d / depth;
+        ctx.strokeStyle = 'rgba(' + Math.round(226 * k + 94 * (1 - k)) + ',' + Math.round(168 * k + 193 * (1 - k)) + ',' + Math.round(90 * k + 217 * (1 - k)) + ',' + (0.35 + k * 0.6) + ')';
+        ctx.lineWidth = Math.max(0.6, k * 5);
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x2, y2); ctx.stroke();
+        branch(x2, y2, len * 0.72, a - ang + sway, d - 1); branch(x2, y2, len * 0.72, a + ang + sway, d - 1);
+      }
+      branch(w / 2, h - 10, h * 0.28, -Math.PI / 2, depth);
+      read.textContent = n;
+    });
+  })();
+
+  /* =====================================================================
+     06 · ondas (deslizador)
+     ===================================================================== */
+  (function waveCtl() {
+    var s = $('#waveDetune'); if (!s) return;
+    var apply = function () { if (window.Scenes) window.Scenes.params.waveDetune = +s.value / 100; };
+    s.addEventListener('input', apply); apply();
+  })();
+
+  /* =====================================================================
+     08 · generador binaural (Web Audio)
+     ===================================================================== */
+  var binaural = { playing: false, ctx: null, nodes: null, stop: function () {} };
+  (function bin() {
+    var box = $('#binaural'); if (!box) return;
+    var play = $('#binPlay'), beat = $('#binBeat'), base = $('#binBase'), noise = $('#binNoise'), vol = $('#binVol');
+    var BASES = [['C3', 65.41], ['G3', 98.00], ['C4', 130.81], ['E4', 164.81]];
+    var scope = $('#binScope'), analyser = null;
+    function readout() {
+      var b = BASES[+base.value], fl = b[1], fr = fl + +beat.value;
+      $('#binBeatV').textContent = (+beat.value).toFixed(1) + ' Hz';
+      $('#binBaseV').textContent = b[0] + ' · ' + fl.toFixed(2) + ' Hz';
+      $('#binNoiseV').textContent = noise.value + ' %'; $('#binVolV').textContent = vol.value + ' %';
+      $('#binL').textContent = fl.toFixed(2) + ' Hz'; $('#binR').textContent = fr.toFixed(2) + ' Hz';
+      $('#binCents').textContent = '+' + Math.round(1200 * Math.log2(fr / fl)) + ' cents';
+      var bt = +beat.value, band = bt < 4 ? 'delta' : bt < 8 ? 'theta' : bt < 12 ? 'alpha' : 'beta';
+      $$('#brainWaves div').forEach(function (d) { d.classList.toggle('is-on', d.getAttribute('data-w') === band); });
+      if (binaural.nodes) {
+        var n = binaural.nodes, now = binaural.ctx.currentTime;
+        n.oL.frequency.setTargetAtTime(fl, now, 0.05); n.oR.frequency.setTargetAtTime(fr, now, 0.05);
+        n.gNoise.gain.setTargetAtTime((+noise.value / 100) * 0.35, now, 0.05);
+        n.master.gain.setTargetAtTime((+vol.value / 100) * 0.5, now, 0.05);
+      }
+    }
+    [beat, base, noise, vol].forEach(function (el) { el.addEventListener('input', readout); });
+    readout();
+
+    function pinkBuffer(ctx) {
+      var len = ctx.sampleRate * 4, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+      var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (var i = 0; i < len; i++) {
+        var w = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520;
+        b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980;
+        d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
+      }
+      return buf;
+    }
+    function start() {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) { play.textContent = 'Sin audio en este navegador'; play.disabled = true; return; }
+      var ctx = binaural.ctx || new AC(); binaural.ctx = ctx; if (ctx.state === 'suspended') ctx.resume();
+      var master = ctx.createGain(); master.gain.value = 0;
+      var oL = ctx.createOscillator(), oR = ctx.createOscillator(); oL.type = 'sine'; oR.type = 'sine';
+      var pL = ctx.createStereoPanner ? ctx.createStereoPanner() : null, pR = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      var gTone = ctx.createGain(); gTone.gain.value = 0.28;
+      if (pL && pR) { pL.pan.value = -1; pR.pan.value = 1; oL.connect(pL).connect(gTone); oR.connect(pR).connect(gTone); }
+      else { var m = ctx.createChannelMerger(2); oL.connect(m, 0, 0); oR.connect(m, 0, 1); m.connect(gTone); }
+      var src = ctx.createBufferSource(); src.buffer = pinkBuffer(ctx); src.loop = true;
+      var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1600; lp.Q.value = 0.5;
+      var gNoise = ctx.createGain(); gNoise.gain.value = 0;
+      src.connect(lp).connect(gNoise).connect(master);
+      gTone.connect(master);
+      analyser = ctx.createAnalyser(); analyser.fftSize = 2048; master.connect(analyser).connect(ctx.destination);
+      oL.start(); oR.start(); src.start();
+      binaural.nodes = { oL: oL, oR: oR, src: src, gNoise: gNoise, master: master };
+      binaural.playing = true; readout();
+      master.gain.setTargetAtTime((+vol.value / 100) * 0.5, ctx.currentTime, 0.6);
+      play.textContent = '■ Detener'; play.classList.add('is-on');
+      $('#status').textContent = 'underclocking · ' + (+beat.value).toFixed(1) + ' Hz';
+    }
+    function stop() {
+      if (!binaural.nodes) return;
+      var n = binaural.nodes, ctx = binaural.ctx, now = ctx.currentTime;
+      n.master.gain.setTargetAtTime(0, now, 0.25);
+      setTimeout(function () { try { n.oL.stop(); n.oR.stop(); n.src.stop(); } catch (e) {} n.master.disconnect(); }, 1200);
+      binaural.nodes = null; binaural.playing = false; analyser = null;
+      play.textContent = '▶ Iniciar'; play.classList.remove('is-on');
+      if (current) $('#status').textContent = STATUS[current] || 'observando';
+    }
+    binaural.stop = stop;
+    play.addEventListener('click', function () { binaural.playing ? stop() : start(); });
+
+    var data = new Uint8Array(2048);
+    addTick('manual', function (t) {
+      var f = fit2d(scope), ctx = f.ctx, w = f.w, h = f.h; ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = 'rgba(233,228,216,0.08)'; ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+      ctx.lineWidth = 1.5;
+      if (analyser) {
+        analyser.getByteTimeDomainData(data);
+        ctx.strokeStyle = 'rgba(226,168,90,0.95)'; ctx.beginPath();
+        for (var i = 0; i < data.length; i++) { var x = i / data.length * w, y = h / 2 + (data[i] - 128) / 128 * h * 0.45; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
+      } else {
+        var b = BASES[+base.value][1], bt = +beat.value;
+        ctx.strokeStyle = 'rgba(94,193,217,0.5)'; ctx.beginPath();
+        for (var k = 0; k <= w; k += 2) { var u = k / w * 1.6, env = Math.abs(Math.cos(u * Math.PI * bt / 2)), y2 = h / 2 + Math.sin(u * Math.PI * 2 * 40) * h * 0.4 * env; k ? ctx.lineTo(k, y2) : ctx.moveTo(k, y2); }
+        ctx.stroke();
+        ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(115,111,102,1)';
+        ctx.fillText('vista previa del pulso que renderiza tu cerebro · ' + b.toFixed(2) + ' + ' + bt.toFixed(1) + ' Hz', 12, 16);
+      }
+    });
+  })();
+
+  /* =====================================================================
+     arranque
+     ===================================================================== */
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
+  var first = location.hash.replace('#', '');
+  go(document.getElementById(first) && first ? first : 'inicio', { noHash: !first, noScroll: true, force: true });
+  requestAnimationFrame(function () { window.scrollTo(0, 0); });
+  ticker.id = requestAnimationFrame(tick);
+})();
+
+</script>

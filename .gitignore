@@ -1,0 +1,5 @@
+build/*.png
+build/artifact-url.txt
+.vercel/
+node_modules/
+.DS_Store
