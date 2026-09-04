@@ -599,6 +599,95 @@ tr:last-child td { border-bottom: 0; }
 .chapter-body, .chapter-head { min-width: 0; }
 .wide, .block { min-width: 0; }
 
+/* =====================================================================
+   Artefactos v2: etiquetas ancladas + bloque "qué estás viendo"
+   ===================================================================== */
+.artefact { height: clamp(260px, 44vh, 520px); }
+.artefact canvas { touch-action: pan-y; }
+.artefact-caption { display: none; }
+.artefact-tag {
+  position: absolute; top: var(--s3); left: var(--s5); z-index: 2; pointer-events: none;
+  font-family: var(--f-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.artefact-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.a-label {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); white-space: nowrap;
+  font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; color: var(--ink);
+  background: rgba(11, 13, 18, 0.8); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  padding: 3px 9px; will-change: transform;
+}
+.a-label::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--ink); vertical-align: 1px; }
+.a-label.w::before { background: var(--warm); } .a-label.c::before { background: var(--cold); }
+.a-label.g::before { background: var(--ink-3); } .a-label.i::before { background: var(--ink); }
+.a-label.l::before { width: 14px; height: 2px; border-radius: 0; background: var(--ink-2); vertical-align: 3px; }
+.a-label.big { font-size: 0.8rem; padding: 5px 11px; }
+.a-label.is-hidden { display: none; }
+
+.explain {
+  display: grid; grid-template-columns: 1fr; gap: var(--s5);
+  padding: var(--s5); border-bottom: 1px solid var(--line); background: var(--bg-2);
+}
+@media (min-width: 900px) { .explain { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); padding: var(--s6) var(--s8); gap: var(--s8); } }
+.explain h3 { font-size: var(--t2); margin: var(--s2) 0 var(--s3); }
+.explain-text p:not(.eyebrow) { color: var(--ink-2); max-width: 62ch; }
+.explain-side { display: grid; gap: var(--s4); align-content: start; }
+.legend-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); font-family: var(--f-mono); font-size: 0.74rem; color: var(--ink-2); letter-spacing: 0.03em; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: var(--s2); vertical-align: 0; background: var(--ink); }
+.dot.w { background: var(--warm); } .dot.c { background: var(--cold); } .dot.i { background: var(--ink); } .dot.g { background: var(--ink-3); }
+.dot.l { width: 14px; height: 2px; border-radius: 0; background: var(--ink-2); vertical-align: 3px; }
+.hint { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.6; }
+.ctl { display: grid; gap: var(--s2); }
+.ctl label { display: flex; justify-content: space-between; gap: var(--s3); font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); letter-spacing: 0.04em; }
+.ctl label b { color: var(--warm); font-weight: 500; text-align: right; }
+.btn-row { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.btn.alert:hover { border-color: var(--alert); background: var(--alert-dim); }
+.btn.alert.is-on { background: var(--alert); border-color: var(--alert); color: var(--bg); }
+
+/* =====================================================================
+   Móvil: orden, tamaños y áreas de toque
+   ===================================================================== */
+.rail-hint { display: none; margin: 0; padding: 0 var(--s4) var(--s2); text-align: center; font-family: var(--f-mono); font-size: 0.64rem; color: var(--ink-3); letter-spacing: 0.08em; }
+@media (max-width: 1039px) {
+  .rail-hint { display: block; }
+  .rail-btn { padding: var(--s3) var(--s4); }
+  .rail-list { padding-bottom: var(--s1); }
+}
+@media (max-width: 720px) {
+  .chapter-head { padding: var(--s6) var(--s4) var(--s5); }
+  .chapter-title { font-size: clamp(2.2rem, 10.5vw, 3rem); max-width: none; }
+  .chapter-lede { font-size: 1.05rem; margin-top: var(--s4); }
+  .chapter-body { padding: var(--s6) var(--s4) var(--s8); gap: var(--s6); }
+  .artefact { height: clamp(240px, 42vh, 380px); }
+  .artefact-tag { left: var(--s4); }
+  .explain { padding: var(--s4); gap: var(--s4); }
+  .explain h3 { font-size: var(--t1); }
+  .block h2 { font-size: var(--t3); }
+  .block h3 { font-size: var(--t1); }
+  .callout { font-size: var(--t1); padding-left: var(--s4); }
+  .hero-line { font-size: var(--t3); }
+  .steps li { grid-template-columns: 40px minmax(0, 1fr); gap: var(--s3); }
+  .steps li::before { font-size: var(--t3); }
+  .theory summary { padding: var(--s4); grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--s3); }
+  .theory summary .r { font-size: var(--t2); }
+  .theory summary h3 { font-size: var(--t1); }
+  .theory .body { padding: 0 var(--s4) var(--s5); }
+  .world { padding: var(--s4); }
+  .fast-hours { font-size: var(--t4); }
+  .brain-svg text { font-size: 13px; }
+  .evo-card { flex-basis: 78vw; }
+  .log li { padding: var(--s5) 0; }
+  .log blockquote { font-size: var(--t1); max-width: none; }
+  .thinker { padding: var(--s4); }
+  .tool { padding: var(--s4); }
+  .binaural { padding: var(--s4); }
+  .ram { padding: var(--s4); }
+  .fast { padding: var(--s4); }
+  .next .t { font-size: var(--t2); }
+  .footer { padding: var(--s7) var(--s4); }
+}
+
+.chapter { scroll-margin-top: 140px; }
+
 </style>
 <header class="topbar">
   <div class="brand">
@@ -624,6 +713,7 @@ tr:last-child td { border-bottom: 0; }
       <li><button class="rail-btn" data-go="manual"><span class="n">08</span><span class="t">Manual de operación</span></button></li>
       <li><button class="rail-btn" data-go="bitacora"><span class="n">09</span><span class="t">Bitácora</span></button></li>
     </ul>
+    <p class="rail-hint">desliza para cambiar de capítulo →</p>
     <div class="rail-foot">
       cian = lo construido por humanos<br>
       ámbar = lo que ya estaba ahí<br><br>
@@ -643,9 +733,21 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="lattice">
+      <span class="artefact-tag">artefacto 00</span>
       <canvas aria-label="Artefacto: la Lattice, una red de puntos vibrando en el espacio"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 00</b> · la Lattice</span><span>mueve el cursor: la materia responde al observador</span></figcaption>
+      <div class="artefact-labels" aria-hidden="true"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow warm">qué estás viendo</p>
+        <h3>La Lattice: el espacio no está vacío</h3>
+        <p>Cada punto es un pedazo de materia. Lo que parece aire entre ellos también es materia vibrando; por eso la red no tiene huecos. Cuando pasas el dedo o el cursor, la red se ondula alrededor de tu atención: la materia solo se "renderiza" cuando una consciencia la observa.</p>
+      </div>
+      <div class="explain-side">
+        <ul class="legend-list"><li><span class="dot w"></span>materia que estás observando</li><li><span class="dot i"></span>materia en reposo</li></ul>
+        <p class="hint">Cómo usarlo: pasa el cursor o el dedo por encima de la red.</p>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="hero-thesis">
@@ -693,9 +795,21 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="cage">
+      <span class="artefact-tag">artefacto 01</span>
       <canvas aria-label="Artefacto: una jaula de líneas que se disuelve al acercar el cursor"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 01</b> · la cárcel mental</span><span>acerca el cursor a los barrotes: solo existen mientras no los miras</span></figcaption>
+      <div class="artefact-labels" aria-hidden="true"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow cold">qué estás viendo</p>
+        <h3>La cárcel mental</h3>
+        <p>Los barrotes cian son las creencias que el sistema te instaló: el colegio, el sueldo, el estatus, lo que "debe" ser una vida. La nube ámbar del centro eres tú, la consciencia. Los barrotes solo existen mientras no los miras de cerca: acerca el cursor y se disuelven. Nadie los puso ahí y nadie los sostiene, salvo tu propia atención.</p>
+      </div>
+      <div class="explain-side">
+        <ul class="legend-list"><li><span class="dot c"></span>creencia instalada (un barrote)</li><li><span class="dot w"></span>tú, la consciencia</li></ul>
+        <p class="hint">Cómo usarlo: acerca el cursor o el dedo a un barrote y míralo desaparecer.</p>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="block">
@@ -800,9 +914,21 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="neurons">
+      <span class="artefact-tag">artefacto 02</span>
       <canvas aria-label="Artefacto: una red de neuronas disparando pulsos"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 02</b> · red neuronal</span><span>86 000 millones de neuronas disparando electricidad; esto es una muestra</span></figcaption>
+      <div class="artefact-labels" aria-hidden="true"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow warm">qué estás viendo</p>
+        <h3>Así piensa el hardware</h3>
+        <p>Cada punto es una neurona; cada línea, una sinapsis (el cable que une dos neuronas). Los destellos ámbar son impulsos eléctricos viajando de una a otra. Un pensamiento, un miedo o un recuerdo no son magia: son este tráfico eléctrico, multiplicado por 86 000 millones de neuronas. Aquí ves 260.</p>
+      </div>
+      <div class="explain-side">
+        <ul class="legend-list"><li><span class="dot g"></span>neurona en reposo</li><li><span class="dot w"></span>neurona disparando / impulso</li><li><span class="dot l"></span>sinapsis (cable)</li></ul>
+        <p class="hint">Cómo usarlo: mueve el cursor o el dedo para girar la red.</p>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="block">
@@ -934,9 +1060,21 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="rings">
+      <span class="artefact-tag">artefacto 03</span>
       <canvas aria-label="Artefacto: cuatro anillos concéntricos girando, uno por nivel del sistema"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 03</b> · los cuatro niveles</span><span>cuerpo · ego · consciencia · observador</span></figcaption>
+      <div class="artefact-labels" aria-hidden="true"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow warm">qué estás viendo</p>
+        <h3>Los cuatro niveles, uno dentro de otro</h3>
+        <p>El punto del centro eres tú: el observador, el que mira todo. Alrededor giran, de adentro hacia afuera, el cuerpo (el hardware), el ego (el software que te defiende), la consciencia (el usuario) y, al final, el Todo: la red de la que estás sacando la señal. Cada anillo gira a su propio ritmo, pero todos orbitan el mismo centro. Cuando el ego se pone al mando, es como si el anillo cian quisiera ocupar el centro.</p>
+      </div>
+      <div class="explain-side">
+        <ul class="legend-list"><li><span class="dot w"></span>cuerpo · hardware</li><li><span class="dot c"></span>ego · software</li><li><span class="dot i"></span>consciencia · usuario</li><li><span class="dot g"></span>el Todo · la red</li></ul>
+        <p class="hint">Cómo usarlo: mueve el cursor o el dedo para inclinar el sistema.</p>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="block">
@@ -1019,10 +1157,24 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="bigbang">
+      <span class="artefact-tag">artefacto 04</span>
       <canvas aria-label="Artefacto: el Big Bang, una singularidad expandiéndose en partículas"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 04</b> · inflación cósmica</span><span>arrastra el deslizador: de la singularidad a las galaxias</span></figcaption>
-      <div class="artefact-controls" style="width:min(320px,60%)"><input type="range" id="bangT" min="0" max="1000" value="1000" aria-label="Tiempo desde el Big Bang"></div>
+      <div class="artefact-labels" aria-hidden="true"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow warm">qué estás viendo</p>
+        <h3>13 800 millones de años en un deslizador</h3>
+        <p>Al inicio, todo cabe en un punto sin tamaño: la singularidad. Al avanzar el tiempo, el espacio se estira, las partículas se enfrían y se van agrupando en galaxias. No fue una explosión dentro del espacio: fue el espacio mismo expandiéndose. Los colores solo distinguen unas galaxias de otras.</p>
+      </div>
+      <div class="explain-side">
+        <div class="ctl">
+          <label for="bangT"><span>tiempo desde el Big Bang</span><b id="bangEpoch">hoy · galaxias</b></label>
+          <input type="range" id="bangT" min="0" max="1000" value="1000" aria-label="Tiempo desde el Big Bang">
+        </div>
+        <p class="hint">Cómo usarlo: se reproduce solo al entrar; arrastra el deslizador para ir a cualquier época.</p>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="block">
@@ -1112,9 +1264,21 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="ocean">
+      <span class="artefact-tag">artefacto 05</span>
       <canvas aria-label="Artefacto: una esfera de partículas, el vaso, que se disuelve en un océano"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 05</b> · el vaso y el océano</span><span>toca la escena: la gota regresa al océano y vuelve a subir</span></figcaption>
+      <div class="artefact-labels" aria-hidden="true"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow warm">qué estás viendo</p>
+        <h3>El vaso y el océano</h3>
+        <p>La esfera ámbar es un vaso de agua: tu cuerpo, con un pedazo de consciencia adentro, separado y con nombre. El plano cian es el océano: la consciencia sin bordes. Morir es que el vaso se rompa y el agua regrese al océano. Nacer es que el universo saque otro vaso. El agua nunca se pierde; solo deja de estar separada.</p>
+      </div>
+      <div class="explain-side">
+        <ul class="legend-list"><li><span class="dot w"></span>el vaso · un cuerpo con nombre</li><li><span class="dot c"></span>el océano · la consciencia</li></ul>
+        <div class="btn-row"><button class="btn alert" id="oceanBreak">Romper el vaso</button><button class="btn" id="oceanBorn">Sacar otro vaso</button></div>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="block">
@@ -1182,10 +1346,23 @@ tr:last-child td { border-bottom: 0; }
     </div>
 
     <figure class="artefact" data-scene="waves">
+      <span class="artefact-tag">artefacto 06</span>
       <canvas aria-label="Artefacto: dos ondas que entran en resonancia o se cancelan"></canvas>
-      <figcaption class="artefact-caption"><span><b>artefacto 06</b> · resonancia</span><span>dos frecuencias: cuando están en fase suman amplitud; cuando no, se desgastan</span></figcaption>
-      <div class="artefact-controls" style="width:min(320px,60%)"><input type="range" id="waveDetune" min="0" max="100" value="12" aria-label="Diferencia entre las dos frecuencias"></div>
     </figure>
+    <div class="explain">
+      <div class="explain-text">
+        <p class="eyebrow warm">qué estás viendo</p>
+        <h3>Dos personas, dos frecuencias</h3>
+        <p>La onda ámbar eres tú; la cian, la otra persona. La onda blanca de abajo es la suma: lo que pasa cuando conviven. Con frecuencias parecidas las crestas coinciden y la relación gana amplitud. Cuando difieren mucho, se cancelan y ambos se desgastan. Una diferencia mediana no es mala: es la fricción que se resuelve con acuerdos.</p>
+      </div>
+      <div class="explain-side">
+        <div class="ctl">
+          <label for="waveDetune"><span>diferencia entre los dos</span><b id="waveRead">poca · resonancia</b></label>
+          <input type="range" id="waveDetune" min="0" max="100" value="12" aria-label="Diferencia entre las dos frecuencias">
+        </div>
+        <p class="hint">Cómo usarlo: mueve el deslizador y mira la onda blanca.</p>
+      </div>
+    </div>
 
     <div class="chapter-body">
       <div class="two-worlds wide">
@@ -1514,6 +1691,27 @@ tr:last-child td { border-bottom: 0; }
     var w = Math.max(1, Math.floor(r.width)), h = Math.max(1, Math.floor(r.height));
     return { w: w, h: h, dpr: dpr };
   }
+  /* etiquetas HTML ancladas a puntos 3D */
+  function mkLabel(canvas, text, cls) {
+    var host = canvas.parentNode.querySelector('.artefact-labels'); if (!host) return null;
+    var el = document.createElement('span'); el.className = 'a-label ' + (cls || ''); el.textContent = text; host.appendChild(el); return el;
+  }
+  var _pv = null;
+  function place(el, v3, camera, w, h, dx, dy) {
+    if (!el) return;
+    _pv = _pv || new THREE.Vector3();
+    _pv.copy(v3).project(camera);
+    if (_pv.z > 1 || _pv.z < -1) { el.classList.add('is-hidden'); return; }
+    el.classList.remove('is-hidden');
+    el.style.transform = 'translate(-50%,-50%) translate(' + ((_pv.x + 1) / 2 * w + (dx || 0)).toFixed(1) + 'px,' + ((1 - _pv.y) / 2 * h + (dy || 0)).toFixed(1) + 'px)';
+  }
+  function hide(el) { if (el) el.classList.add('is-hidden'); }
+  /* en pantallas verticales la cámara se aleja para que la escena entera quepa */
+  function fitCam(camera, aspect) {
+    if (camera.userData.z === undefined) camera.userData.z = camera.position.z;
+    var f = aspect < 1 ? Math.min(2.1, 0.92 / aspect) : 1;
+    camera.position.z = camera.userData.z * f;
+  }
   function makeRenderer(canvas) {
     var r = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
     r.setClearColor(0x000000, 0);
@@ -1565,8 +1763,9 @@ tr:last-child td { border-bottom: 0; }
     group.rotation.x = 0.35; group.rotation.y = 0.6;
     var ptr = pointerTracker(canvas);
     var ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3(), target = new THREE.Vector3(999, 999, 0), inv = new THREE.Matrix4();
+    var lbl = mkLabel(canvas, 'aquí estás observando', 'w'), lblW = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         group.rotation.y += dt * 0.05;
         group.rotation.x = 0.35 + Math.sin(t * 0.1) * 0.15;
@@ -1574,7 +1773,8 @@ tr:last-child td { border-bottom: 0; }
           ray.setFromCamera({ x: ptr.x, y: ptr.y }, camera);
           plane.normal.set(0, 0, 1).applyQuaternion(group.quaternion);
           if (ray.ray.intersectPlane(plane, hit)) { inv.copy(group.matrixWorld).invert(); hit.applyMatrix4(inv); target.lerp(hit, 0.15); }
-        } else { target.lerp(new THREE.Vector3(999, 999, 0), 0.02); }
+          lblW.copy(target).applyMatrix4(group.matrixWorld); place(lbl, lblW, camera, W, H, 0, -36);
+        } else { target.lerp(new THREE.Vector3(999, 999, 0), 0.02); hide(lbl); }
         var p = geo.attributes.position.array;
         for (var k = 0; k < count; k++) {
           var bx = base[k * 3], by = base[k * 3 + 1], bz = base[k * 3 + 2];
@@ -1623,12 +1823,17 @@ tr:last-child td { border-bottom: 0; }
     var cloud = new THREE.Points(pg, new THREE.PointsMaterial({ color: COLORS.warm, size: 0.08, transparent: true, opacity: 0.9, depthWrite: false }));
     group.add(cloud);
     var ptr = pointerTracker(canvas), tmp = new THREE.Vector3(), w = 1, h = 1;
+    var lblYou = mkLabel(canvas, 'tú · la consciencia', 'w'), lblBar = mkLabel(canvas, 'una creencia instalada', 'c'), origin = new THREE.Vector3(), barP = new THREE.Vector3();
     return {
-      resize: function (W, H2, dpr) { w = W; h = H2; renderer.setPixelRatio(dpr); renderer.setSize(W, H2, false); camera.aspect = W / H2; camera.updateProjectionMatrix(); },
+      resize: function (W, H2, dpr) { w = W; h = H2; renderer.setPixelRatio(dpr); renderer.setSize(W, H2, false); camera.aspect = W / H2; fitCam(camera, W / H2); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         group.rotation.y += dt * 0.12;
         cloud.rotation.y -= dt * 0.3; cloud.rotation.x += dt * 0.1;
         cloud.material.size = 0.08 + Math.sin(t * 2) * 0.02;
+        group.updateMatrixWorld();
+        place(lblYou, origin, camera, w, h, 0, 42);
+        barP.set(Math.cos(bars[3].userData.a) * R, 2.2, Math.sin(bars[3].userData.a) * R).applyMatrix4(group.matrixWorld);
+        if (bars[3].material.opacity < 0.15) hide(lblBar); else place(lblBar, barP, camera, w, h, 0, -22);
         for (var i = 0; i < bars.length; i++) {
           var b = bars[i];
           tmp.set(Math.cos(b.userData.a) * R, 0, Math.sin(b.userData.a) * R).applyMatrix4(group.matrixWorld).project(camera);
@@ -1687,11 +1892,17 @@ tr:last-child td { border-bottom: 0; }
     group.add(pulsesObj);
     var cDim = new THREE.Color(0x3a4150), cHot = new THREE.Color(COLORS.warm), cEdge = new THREE.Color(0x2a3140), tmpc = new THREE.Color();
     var ptr = pointerTracker(canvas);
+    var lblN = mkLabel(canvas, 'una neurona', 'g'), lblS = mkLabel(canvas, 'sinapsis · el cable', 'l'), lblP = mkLabel(canvas, 'impulso eléctrico', 'w');
+    var lp = new THREE.Vector3(), W = 1, H = 1, e0 = edges[0];
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         group.rotation.y += dt * 0.08 + (ptr.inside ? ptr.x * dt * 0.4 : 0);
         group.rotation.x = lerp(group.rotation.x, ptr.inside ? -ptr.y * 0.35 : Math.sin(t * 0.2) * 0.15, dt * 2);
+        group.updateMatrixWorld();
+        place(lblN, lp.copy(nodes[0]).applyMatrix4(group.matrixWorld), camera, W, H, 0, -22);
+        place(lblS, lp.copy(nodes[e0[0]]).lerp(nodes[e0[1]], 0.5).applyMatrix4(group.matrixWorld), camera, W, H, 0, 20);
+        place(lblP, lp.set(ppos[0], ppos[1], ppos[2]).applyMatrix4(group.matrixWorld), camera, W, H, 0, -22);
         for (var i = 0; i < N; i++) { heat[i] *= (1 - dt * 2.2); if (Math.random() < dt * 0.35) heat[i] = 1; }
         for (i = 0; i < N; i++) { tmpc.copy(cDim).lerp(cHot, heat[i]); ncol[i * 3] = tmpc.r; ncol[i * 3 + 1] = tmpc.g; ncol[i * 3 + 2] = tmpc.b; }
         ng.attributes.color.needsUpdate = true;
@@ -1744,13 +1955,19 @@ tr:last-child td { border-bottom: 0; }
     var core = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3)), new THREE.PointsMaterial({ color: COLORS.ink, size: 0.35, transparent: true, opacity: 1 }));
     group.add(core);
     var ptr = pointerTracker(canvas);
+    var names = ['cuerpo · hardware', 'ego · software', 'consciencia · usuario', 'el Todo · la red'], cls = ['w', 'c', 'i', 'g'];
+    var lbls = names.map(function (n, i) { return mkLabel(canvas, n, cls[i]); }), lblCore = mkLabel(canvas, 'tú · el observador', 'i big');
+    var lp = new THREE.Vector3(), origin = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         rings.forEach(function (r) { r.obj.rotation.x += r.d.speed[0] * dt; r.obj.rotation.y += r.d.speed[1] * dt; r.obj.rotation.z += r.d.speed[2] * dt; });
         group.rotation.y = lerp(group.rotation.y, ptr.inside ? ptr.x * 0.5 : 0, dt * 2);
         group.rotation.x = lerp(group.rotation.x, ptr.inside ? -ptr.y * 0.3 : 0.2, dt * 2);
         core.material.size = 0.3 + Math.sin(t * 1.5) * 0.08;
+        group.updateMatrixWorld();
+        rings.forEach(function (r, i) { place(lbls[i], lp.set(r.d.r, 0, 0).applyMatrix4(r.obj.matrixWorld), camera, W, H, 0, i % 2 ? 18 : -18); });
+        place(lblCore, origin, camera, W, H, 0, 30);
         renderer.render(scene, camera);
       },
       dispose: function () { renderer.dispose(); }
@@ -1783,12 +2000,18 @@ tr:last-child td { border-bottom: 0; }
     var mat = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
     var points = new THREE.Points(geo, mat); scene.add(points);
     var ptr = pointerTracker(canvas);
+    var lblS = mkLabel(canvas, 'singularidad · todo en un punto', 'w big'), lblG = mkLabel(canvas, 'una galaxia', 'c'), lblU = mkLabel(canvas, 'sopa de partículas enfriándose', 'i');
+    var lp = new THREE.Vector3(), origin = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         var T = params.bangT; // 0..1
         var e = ease(Math.min(1, T * 1.15));
         var burst = Math.min(1, T * 6);            // inflación: los primeros milisegundos
+        points.updateMatrixWorld();
+        if (T < 0.05) { place(lblS, origin, camera, W, H, 0, -34); hide(lblU); hide(lblG); }
+        else if (e < 0.7) { hide(lblS); hide(lblG); place(lblU, lp.set(dir[0] * 9 * burst, dir[1] * 9 * burst, dir[2] * 9 * burst).lerp(lp.set(finalPos[0], finalPos[1], finalPos[2]), e).applyMatrix4(points.matrixWorld), camera, W, H, 0, -22); }
+        else { hide(lblS); hide(lblU); place(lblG, lp.copy(centers[0]).applyMatrix4(points.matrixWorld), camera, W, H, 0, -30); }
         var p = geo.attributes.position.array;
         for (var i = 0; i < N; i++) {
           var bx = dir[i * 3] * 9 * burst, by = dir[i * 3 + 1] * 9 * burst, bz = dir[i * 3 + 2] * 9 * burst;
@@ -1825,14 +2048,25 @@ tr:last-child td { border-bottom: 0; }
     var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
     var mat = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
     scene.add(new THREE.Points(geo, mat));
+    // el océano siempre está ahí, tenue, esperando al vaso
+    var M = 2600, seaPos = new Float32Array(M * 3), seaBase = new Float32Array(M * 2);
+    for (var q = 0; q < M; q++) { seaBase[q * 2] = rand(-W / 2, W / 2); seaBase[q * 2 + 1] = rand(-W / 2, W / 2); }
+    var seaGeo = new THREE.BufferGeometry(); seaGeo.setAttribute('position', new THREE.BufferAttribute(seaPos, 3));
+    scene.add(new THREE.Points(seaGeo, new THREE.PointsMaterial({ color: COLORS.cold, size: 0.06, transparent: true, opacity: 0.35, depthWrite: false })));
     var morph = 0, target = 0, flip = function () { target = target > 0.5 ? 0 : 1; };
     canvas.addEventListener('pointerdown', flip);
     var ptr = pointerTracker(canvas), spin = 0;
+    var lblV = mkLabel(canvas, 'el vaso · tu cuerpo, con nombre', 'w big'), lblO = mkLabel(canvas, 'el océano · la consciencia sin bordes', 'c big'), lblD = mkLabel(canvas, 'el agua regresa · nada se pierde', 'i');
+    var lp = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      setTarget: function (v) { target = v; },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         morph += (target - morph) * Math.min(1, dt * 1.4);
         var m = ease(Math.max(0, Math.min(1, morph)));
+        if (m < 0.15) { place(lblV, lp.set(0, 5.2, 0), camera, W, H, 0, 0); hide(lblO); hide(lblD); }
+        else if (m > 0.85) { hide(lblV); hide(lblD); place(lblO, lp.set(0, -2.5, 6), camera, W, H, 0, 0); }
+        else { hide(lblV); hide(lblO); place(lblD, lp.set(0, 0, 0), camera, W, H, 0, 0); }
         var p = geo.attributes.position.array;
         spin += dt * 0.25;
         for (var i = 0; i < N; i++) {
@@ -1846,6 +2080,8 @@ tr:last-child td { border-bottom: 0; }
           col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
         }
         geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
+        for (var q = 0; q < M; q++) { var qx = seaBase[q * 2], qz = seaBase[q * 2 + 1]; seaPos[q * 3] = qx; seaPos[q * 3 + 1] = -2.6 + Math.sin(qx * 0.6 + t * 1.2) * 0.25 + Math.cos(qz * 0.5 + t * 0.9) * 0.25; seaPos[q * 3 + 2] = qz; }
+        seaGeo.attributes.position.needsUpdate = true;
         camera.position.x = lerp(camera.position.x, ptr.inside ? ptr.x * 4 : 0, dt);
         camera.lookAt(0, 0, 0);
         renderer.render(scene, camera);
@@ -1876,14 +2112,16 @@ tr:last-child td { border-bottom: 0; }
         var s2 = function (u) { return Math.sin(u * Math.PI * 2 * f2 - ph * (f2 / f1)) * amp; };
         ctx.strokeStyle = 'rgba(233,228,216,0.08)'; ctx.lineWidth = 1;
         [0.28, 0.5, 0.78].forEach(function (k) { ctx.beginPath(); ctx.moveTo(0, h * k); ctx.lineTo(w, h * k); ctx.stroke(); });
-        wave(h * 0.28, s1, 'rgba(226,168,90,0.9)', 1.5);
-        wave(h * 0.5, s2, 'rgba(94,193,217,0.9)', 1.5);
-        wave(h * 0.78, function (u) { return (s1(u) + s2(u)) * 0.9; }, 'rgba(233,228,216,0.95)', 2.2);
-        ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(115,111,102,1)';
-        ctx.fillText('yo · ' + f1.toFixed(2) + ' Hz', 16, h * 0.28 - amp - 10);
-        ctx.fillText('la otra persona · ' + f2.toFixed(2) + ' Hz', 16, h * 0.5 - amp - 10);
-        var label = detune < 0.06 ? 'resonancia: las amplitudes se suman' : detune < 0.45 ? 'fricción: hay batimiento, hay acuerdos por hacer' : 'cancelación: la energía se anula';
-        ctx.fillText('suma · ' + label, 16, h * 0.78 - amp * 1.8 - 10);
+        wave(h * 0.28, s1, 'rgba(226,168,90,0.9)', 2);
+        wave(h * 0.5, s2, 'rgba(94,193,217,0.9)', 2);
+        wave(h * 0.78, function (u) { return (s1(u) + s2(u)) * 0.9; }, 'rgba(233,228,216,0.95)', 2.6);
+        var small = w < 520, fs = small ? 11 : 13;
+        ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace';
+        function tag(text, y, color) { var tw = ctx.measureText(text).width + 16; ctx.fillStyle = 'rgba(11,13,18,0.8)'; ctx.fillRect(12, y - fs - 6, tw, fs + 12); ctx.fillStyle = color; ctx.fillText(text, 20, y); }
+        tag('TÚ · ' + f1.toFixed(1) + ' Hz', h * 0.28 - amp - 12, 'rgba(226,168,90,1)');
+        tag('LA OTRA PERSONA · ' + f2.toFixed(1) + ' Hz', h * 0.5 - amp - 12, 'rgba(94,193,217,1)');
+        var label = detune < 0.06 ? 'RESONANCIA · las crestas se suman' : detune < 0.45 ? 'FRICCIÓN · hay batimiento, hay acuerdos por hacer' : 'CANCELACIÓN · la energía se anula';
+        tag('LA RELACIÓN (SUMA) · ' + label, h * 0.78 - amp * 1.8 - 12, 'rgba(233,228,216,1)');
       },
       dispose: function () {}
     };
@@ -1928,6 +2166,7 @@ tr:last-child td { border-bottom: 0; }
       if (REDUCED) { inst.fig.classList.add('is-static'); inst.update(2, 0); return; }
       rafId = requestAnimationFrame(loop);
     },
+    get: function (name) { return ensure(name); },
     sceneOf: function (chapterEl) { var f = chapterEl && chapterEl.querySelector('.artefact[data-scene]'); return f ? f.getAttribute('data-scene') : null; }
   };
 })();
@@ -2101,18 +2340,31 @@ tr:last-child td { border-bottom: 0; }
      04 · big bang (deslizador) + animación automática
      ===================================================================== */
   var bang = { touched: false, anim: null };
+  function bangEpoch(k) {
+    var el = $('#bangEpoch'); if (!el) return;
+    el.textContent = k < 0.03 ? 'la singularidad · tamaño cero' : k < 0.1 ? 'inflación · 10⁻³⁶ segundos' : k < 0.35 ? 'sopa de partículas · primeros minutos' : k < 0.55 ? 'primeros átomos · 380 000 años' : k < 0.8 ? 'primeras estrellas · 200 millones de años' : k < 0.97 ? 'galaxias · miles de millones de años' : 'hoy · 13 800 millones de años';
+  }
+  function setBang(k) { if (window.Scenes) window.Scenes.params.bangT = k; bangEpoch(k); }
   (function bangInit() {
     var s = $('#bangT'); if (!s) return;
-    s.addEventListener('input', function () { bang.touched = true; if (window.Scenes) window.Scenes.params.bangT = +s.value / 1000; });
+    s.addEventListener('input', function () { bang.touched = true; setBang(+s.value / 1000); });
     s.addEventListener('pointerdown', function () { bang.touched = true; if (bang.anim) cancelAnimationFrame(bang.anim); });
+    bangEpoch(+s.value / 1000);
   })();
   function playBang() {
     var s = $('#bangT'); if (!s || bang.touched || REDUCED) return;
-    var t0 = performance.now(), D = 7000;
-    function f(now) { var k = Math.min(1, (now - t0) / D); s.value = Math.round(k * 1000); if (window.Scenes) window.Scenes.params.bangT = k; if (k < 1) bang.anim = requestAnimationFrame(f); }
-    s.value = 0; if (window.Scenes) window.Scenes.params.bangT = 0;
+    var t0 = performance.now(), D = 9000;
+    function f(now) { var k = Math.min(1, (now - t0) / D); s.value = Math.round(k * 1000); setBang(k); if (k < 1) bang.anim = requestAnimationFrame(f); }
+    s.value = 0; setBang(0);
     bang.anim = requestAnimationFrame(f);
   }
+
+  /* 05 · botones del vaso y el océano */
+  (function oceanCtl() {
+    var b1 = $('#oceanBreak'), b2 = $('#oceanBorn'); if (!b1 || !b2) return;
+    function set(v) { var sc = window.Scenes && window.Scenes.get('ocean'); if (sc && sc.setTarget) sc.setTarget(v); b1.classList.toggle('is-on', v === 1); b2.classList.toggle('is-on', v === 0); }
+    b1.addEventListener('click', function () { set(1); }); b2.addEventListener('click', function () { set(0); });
+  })();
 
   /* =====================================================================
      04 · entropía (tinta en agua)
@@ -2198,7 +2450,8 @@ tr:last-child td { border-bottom: 0; }
      ===================================================================== */
   (function waveCtl() {
     var s = $('#waveDetune'); if (!s) return;
-    var apply = function () { if (window.Scenes) window.Scenes.params.waveDetune = +s.value / 100; };
+    var read = $('#waveRead');
+    var apply = function () { var d = +s.value / 100; if (window.Scenes) window.Scenes.params.waveDetune = d; if (read) read.textContent = d < 0.06 ? 'poca · resonancia' : d < 0.45 ? 'mediana · fricción y acuerdos' : 'mucha · cancelación'; };
     s.addEventListener('input', apply); apply();
   })();
 
@@ -2303,6 +2556,7 @@ tr:last-child td { border-bottom: 0; }
   var first = location.hash.replace('#', '');
   go(document.getElementById(first) && first ? first : 'inicio', { noHash: !first, noScroll: true, force: true });
   requestAnimationFrame(function () { window.scrollTo(0, 0); });
+  window.addEventListener('load', function () { window.scrollTo(0, 0); setTimeout(function () { window.scrollTo(0, 0); }, 80); });
   ticker.id = requestAnimationFrame(tick);
 })();
 

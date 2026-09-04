@@ -27,6 +27,27 @@
     var w = Math.max(1, Math.floor(r.width)), h = Math.max(1, Math.floor(r.height));
     return { w: w, h: h, dpr: dpr };
   }
+  /* etiquetas HTML ancladas a puntos 3D */
+  function mkLabel(canvas, text, cls) {
+    var host = canvas.parentNode.querySelector('.artefact-labels'); if (!host) return null;
+    var el = document.createElement('span'); el.className = 'a-label ' + (cls || ''); el.textContent = text; host.appendChild(el); return el;
+  }
+  var _pv = null;
+  function place(el, v3, camera, w, h, dx, dy) {
+    if (!el) return;
+    _pv = _pv || new THREE.Vector3();
+    _pv.copy(v3).project(camera);
+    if (_pv.z > 1 || _pv.z < -1) { el.classList.add('is-hidden'); return; }
+    el.classList.remove('is-hidden');
+    el.style.transform = 'translate(-50%,-50%) translate(' + ((_pv.x + 1) / 2 * w + (dx || 0)).toFixed(1) + 'px,' + ((1 - _pv.y) / 2 * h + (dy || 0)).toFixed(1) + 'px)';
+  }
+  function hide(el) { if (el) el.classList.add('is-hidden'); }
+  /* en pantallas verticales la cámara se aleja para que la escena entera quepa */
+  function fitCam(camera, aspect) {
+    if (camera.userData.z === undefined) camera.userData.z = camera.position.z;
+    var f = aspect < 1 ? Math.min(2.1, 0.92 / aspect) : 1;
+    camera.position.z = camera.userData.z * f;
+  }
   function makeRenderer(canvas) {
     var r = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
     r.setClearColor(0x000000, 0);
@@ -78,8 +99,9 @@
     group.rotation.x = 0.35; group.rotation.y = 0.6;
     var ptr = pointerTracker(canvas);
     var ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3(), target = new THREE.Vector3(999, 999, 0), inv = new THREE.Matrix4();
+    var lbl = mkLabel(canvas, 'aquí estás observando', 'w'), lblW = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         group.rotation.y += dt * 0.05;
         group.rotation.x = 0.35 + Math.sin(t * 0.1) * 0.15;
@@ -87,7 +109,8 @@
           ray.setFromCamera({ x: ptr.x, y: ptr.y }, camera);
           plane.normal.set(0, 0, 1).applyQuaternion(group.quaternion);
           if (ray.ray.intersectPlane(plane, hit)) { inv.copy(group.matrixWorld).invert(); hit.applyMatrix4(inv); target.lerp(hit, 0.15); }
-        } else { target.lerp(new THREE.Vector3(999, 999, 0), 0.02); }
+          lblW.copy(target).applyMatrix4(group.matrixWorld); place(lbl, lblW, camera, W, H, 0, -36);
+        } else { target.lerp(new THREE.Vector3(999, 999, 0), 0.02); hide(lbl); }
         var p = geo.attributes.position.array;
         for (var k = 0; k < count; k++) {
           var bx = base[k * 3], by = base[k * 3 + 1], bz = base[k * 3 + 2];
@@ -136,12 +159,17 @@
     var cloud = new THREE.Points(pg, new THREE.PointsMaterial({ color: COLORS.warm, size: 0.08, transparent: true, opacity: 0.9, depthWrite: false }));
     group.add(cloud);
     var ptr = pointerTracker(canvas), tmp = new THREE.Vector3(), w = 1, h = 1;
+    var lblYou = mkLabel(canvas, 'tú · la consciencia', 'w'), lblBar = mkLabel(canvas, 'una creencia instalada', 'c'), origin = new THREE.Vector3(), barP = new THREE.Vector3();
     return {
-      resize: function (W, H2, dpr) { w = W; h = H2; renderer.setPixelRatio(dpr); renderer.setSize(W, H2, false); camera.aspect = W / H2; camera.updateProjectionMatrix(); },
+      resize: function (W, H2, dpr) { w = W; h = H2; renderer.setPixelRatio(dpr); renderer.setSize(W, H2, false); camera.aspect = W / H2; fitCam(camera, W / H2); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         group.rotation.y += dt * 0.12;
         cloud.rotation.y -= dt * 0.3; cloud.rotation.x += dt * 0.1;
         cloud.material.size = 0.08 + Math.sin(t * 2) * 0.02;
+        group.updateMatrixWorld();
+        place(lblYou, origin, camera, w, h, 0, 42);
+        barP.set(Math.cos(bars[3].userData.a) * R, 2.2, Math.sin(bars[3].userData.a) * R).applyMatrix4(group.matrixWorld);
+        if (bars[3].material.opacity < 0.15) hide(lblBar); else place(lblBar, barP, camera, w, h, 0, -22);
         for (var i = 0; i < bars.length; i++) {
           var b = bars[i];
           tmp.set(Math.cos(b.userData.a) * R, 0, Math.sin(b.userData.a) * R).applyMatrix4(group.matrixWorld).project(camera);
@@ -200,11 +228,17 @@
     group.add(pulsesObj);
     var cDim = new THREE.Color(0x3a4150), cHot = new THREE.Color(COLORS.warm), cEdge = new THREE.Color(0x2a3140), tmpc = new THREE.Color();
     var ptr = pointerTracker(canvas);
+    var lblN = mkLabel(canvas, 'una neurona', 'g'), lblS = mkLabel(canvas, 'sinapsis · el cable', 'l'), lblP = mkLabel(canvas, 'impulso eléctrico', 'w');
+    var lp = new THREE.Vector3(), W = 1, H = 1, e0 = edges[0];
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         group.rotation.y += dt * 0.08 + (ptr.inside ? ptr.x * dt * 0.4 : 0);
         group.rotation.x = lerp(group.rotation.x, ptr.inside ? -ptr.y * 0.35 : Math.sin(t * 0.2) * 0.15, dt * 2);
+        group.updateMatrixWorld();
+        place(lblN, lp.copy(nodes[0]).applyMatrix4(group.matrixWorld), camera, W, H, 0, -22);
+        place(lblS, lp.copy(nodes[e0[0]]).lerp(nodes[e0[1]], 0.5).applyMatrix4(group.matrixWorld), camera, W, H, 0, 20);
+        place(lblP, lp.set(ppos[0], ppos[1], ppos[2]).applyMatrix4(group.matrixWorld), camera, W, H, 0, -22);
         for (var i = 0; i < N; i++) { heat[i] *= (1 - dt * 2.2); if (Math.random() < dt * 0.35) heat[i] = 1; }
         for (i = 0; i < N; i++) { tmpc.copy(cDim).lerp(cHot, heat[i]); ncol[i * 3] = tmpc.r; ncol[i * 3 + 1] = tmpc.g; ncol[i * 3 + 2] = tmpc.b; }
         ng.attributes.color.needsUpdate = true;
@@ -257,13 +291,19 @@
     var core = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3)), new THREE.PointsMaterial({ color: COLORS.ink, size: 0.35, transparent: true, opacity: 1 }));
     group.add(core);
     var ptr = pointerTracker(canvas);
+    var names = ['cuerpo · hardware', 'ego · software', 'consciencia · usuario', 'el Todo · la red'], cls = ['w', 'c', 'i', 'g'];
+    var lbls = names.map(function (n, i) { return mkLabel(canvas, n, cls[i]); }), lblCore = mkLabel(canvas, 'tú · el observador', 'i big');
+    var lp = new THREE.Vector3(), origin = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         rings.forEach(function (r) { r.obj.rotation.x += r.d.speed[0] * dt; r.obj.rotation.y += r.d.speed[1] * dt; r.obj.rotation.z += r.d.speed[2] * dt; });
         group.rotation.y = lerp(group.rotation.y, ptr.inside ? ptr.x * 0.5 : 0, dt * 2);
         group.rotation.x = lerp(group.rotation.x, ptr.inside ? -ptr.y * 0.3 : 0.2, dt * 2);
         core.material.size = 0.3 + Math.sin(t * 1.5) * 0.08;
+        group.updateMatrixWorld();
+        rings.forEach(function (r, i) { place(lbls[i], lp.set(r.d.r, 0, 0).applyMatrix4(r.obj.matrixWorld), camera, W, H, 0, i % 2 ? 18 : -18); });
+        place(lblCore, origin, camera, W, H, 0, 30);
         renderer.render(scene, camera);
       },
       dispose: function () { renderer.dispose(); }
@@ -296,12 +336,18 @@
     var mat = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
     var points = new THREE.Points(geo, mat); scene.add(points);
     var ptr = pointerTracker(canvas);
+    var lblS = mkLabel(canvas, 'singularidad · todo en un punto', 'w big'), lblG = mkLabel(canvas, 'una galaxia', 'c'), lblU = mkLabel(canvas, 'sopa de partículas enfriándose', 'i');
+    var lp = new THREE.Vector3(), origin = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         var T = params.bangT; // 0..1
         var e = ease(Math.min(1, T * 1.15));
         var burst = Math.min(1, T * 6);            // inflación: los primeros milisegundos
+        points.updateMatrixWorld();
+        if (T < 0.05) { place(lblS, origin, camera, W, H, 0, -34); hide(lblU); hide(lblG); }
+        else if (e < 0.7) { hide(lblS); hide(lblG); place(lblU, lp.set(dir[0] * 9 * burst, dir[1] * 9 * burst, dir[2] * 9 * burst).lerp(lp.set(finalPos[0], finalPos[1], finalPos[2]), e).applyMatrix4(points.matrixWorld), camera, W, H, 0, -22); }
+        else { hide(lblS); hide(lblU); place(lblG, lp.copy(centers[0]).applyMatrix4(points.matrixWorld), camera, W, H, 0, -30); }
         var p = geo.attributes.position.array;
         for (var i = 0; i < N; i++) {
           var bx = dir[i * 3] * 9 * burst, by = dir[i * 3 + 1] * 9 * burst, bz = dir[i * 3 + 2] * 9 * burst;
@@ -338,14 +384,25 @@
     var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
     var mat = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
     scene.add(new THREE.Points(geo, mat));
+    // el océano siempre está ahí, tenue, esperando al vaso
+    var M = 2600, seaPos = new Float32Array(M * 3), seaBase = new Float32Array(M * 2);
+    for (var q = 0; q < M; q++) { seaBase[q * 2] = rand(-W / 2, W / 2); seaBase[q * 2 + 1] = rand(-W / 2, W / 2); }
+    var seaGeo = new THREE.BufferGeometry(); seaGeo.setAttribute('position', new THREE.BufferAttribute(seaPos, 3));
+    scene.add(new THREE.Points(seaGeo, new THREE.PointsMaterial({ color: COLORS.cold, size: 0.06, transparent: true, opacity: 0.35, depthWrite: false })));
     var morph = 0, target = 0, flip = function () { target = target > 0.5 ? 0 : 1; };
     canvas.addEventListener('pointerdown', flip);
     var ptr = pointerTracker(canvas), spin = 0;
+    var lblV = mkLabel(canvas, 'el vaso · tu cuerpo, con nombre', 'w big'), lblO = mkLabel(canvas, 'el océano · la consciencia sin bordes', 'c big'), lblD = mkLabel(canvas, 'el agua regresa · nada se pierde', 'i');
+    var lp = new THREE.Vector3(), W = 1, H = 1;
     return {
-      resize: function (w, h, dpr) { renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); },
+      setTarget: function (v) { target = v; },
+      resize: function (w, h, dpr) { W = w; H = h; renderer.setPixelRatio(dpr); renderer.setSize(w, h, false); camera.aspect = w / h; fitCam(camera, w / h); camera.updateProjectionMatrix(); },
       update: function (t, dt) {
         morph += (target - morph) * Math.min(1, dt * 1.4);
         var m = ease(Math.max(0, Math.min(1, morph)));
+        if (m < 0.15) { place(lblV, lp.set(0, 5.2, 0), camera, W, H, 0, 0); hide(lblO); hide(lblD); }
+        else if (m > 0.85) { hide(lblV); hide(lblD); place(lblO, lp.set(0, -2.5, 6), camera, W, H, 0, 0); }
+        else { hide(lblV); hide(lblO); place(lblD, lp.set(0, 0, 0), camera, W, H, 0, 0); }
         var p = geo.attributes.position.array;
         spin += dt * 0.25;
         for (var i = 0; i < N; i++) {
@@ -359,6 +416,8 @@
           col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
         }
         geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
+        for (var q = 0; q < M; q++) { var qx = seaBase[q * 2], qz = seaBase[q * 2 + 1]; seaPos[q * 3] = qx; seaPos[q * 3 + 1] = -2.6 + Math.sin(qx * 0.6 + t * 1.2) * 0.25 + Math.cos(qz * 0.5 + t * 0.9) * 0.25; seaPos[q * 3 + 2] = qz; }
+        seaGeo.attributes.position.needsUpdate = true;
         camera.position.x = lerp(camera.position.x, ptr.inside ? ptr.x * 4 : 0, dt);
         camera.lookAt(0, 0, 0);
         renderer.render(scene, camera);
@@ -389,14 +448,16 @@
         var s2 = function (u) { return Math.sin(u * Math.PI * 2 * f2 - ph * (f2 / f1)) * amp; };
         ctx.strokeStyle = 'rgba(233,228,216,0.08)'; ctx.lineWidth = 1;
         [0.28, 0.5, 0.78].forEach(function (k) { ctx.beginPath(); ctx.moveTo(0, h * k); ctx.lineTo(w, h * k); ctx.stroke(); });
-        wave(h * 0.28, s1, 'rgba(226,168,90,0.9)', 1.5);
-        wave(h * 0.5, s2, 'rgba(94,193,217,0.9)', 1.5);
-        wave(h * 0.78, function (u) { return (s1(u) + s2(u)) * 0.9; }, 'rgba(233,228,216,0.95)', 2.2);
-        ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(115,111,102,1)';
-        ctx.fillText('yo · ' + f1.toFixed(2) + ' Hz', 16, h * 0.28 - amp - 10);
-        ctx.fillText('la otra persona · ' + f2.toFixed(2) + ' Hz', 16, h * 0.5 - amp - 10);
-        var label = detune < 0.06 ? 'resonancia: las amplitudes se suman' : detune < 0.45 ? 'fricción: hay batimiento, hay acuerdos por hacer' : 'cancelación: la energía se anula';
-        ctx.fillText('suma · ' + label, 16, h * 0.78 - amp * 1.8 - 10);
+        wave(h * 0.28, s1, 'rgba(226,168,90,0.9)', 2);
+        wave(h * 0.5, s2, 'rgba(94,193,217,0.9)', 2);
+        wave(h * 0.78, function (u) { return (s1(u) + s2(u)) * 0.9; }, 'rgba(233,228,216,0.95)', 2.6);
+        var small = w < 520, fs = small ? 11 : 13;
+        ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace';
+        function tag(text, y, color) { var tw = ctx.measureText(text).width + 16; ctx.fillStyle = 'rgba(11,13,18,0.8)'; ctx.fillRect(12, y - fs - 6, tw, fs + 12); ctx.fillStyle = color; ctx.fillText(text, 20, y); }
+        tag('TÚ · ' + f1.toFixed(1) + ' Hz', h * 0.28 - amp - 12, 'rgba(226,168,90,1)');
+        tag('LA OTRA PERSONA · ' + f2.toFixed(1) + ' Hz', h * 0.5 - amp - 12, 'rgba(94,193,217,1)');
+        var label = detune < 0.06 ? 'RESONANCIA · las crestas se suman' : detune < 0.45 ? 'FRICCIÓN · hay batimiento, hay acuerdos por hacer' : 'CANCELACIÓN · la energía se anula';
+        tag('LA RELACIÓN (SUMA) · ' + label, h * 0.78 - amp * 1.8 - 12, 'rgba(233,228,216,1)');
       },
       dispose: function () {}
     };
@@ -441,6 +502,7 @@
       if (REDUCED) { inst.fig.classList.add('is-static'); inst.update(2, 0); return; }
       rafId = requestAnimationFrame(loop);
     },
+    get: function (name) { return ensure(name); },
     sceneOf: function (chapterEl) { var f = chapterEl && chapterEl.querySelector('.artefact[data-scene]'); return f ? f.getAttribute('data-scene') : null; }
   };
 })();

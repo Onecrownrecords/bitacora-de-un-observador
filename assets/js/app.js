@@ -165,18 +165,31 @@
      04 · big bang (deslizador) + animación automática
      ===================================================================== */
   var bang = { touched: false, anim: null };
+  function bangEpoch(k) {
+    var el = $('#bangEpoch'); if (!el) return;
+    el.textContent = k < 0.03 ? 'la singularidad · tamaño cero' : k < 0.1 ? 'inflación · 10⁻³⁶ segundos' : k < 0.35 ? 'sopa de partículas · primeros minutos' : k < 0.55 ? 'primeros átomos · 380 000 años' : k < 0.8 ? 'primeras estrellas · 200 millones de años' : k < 0.97 ? 'galaxias · miles de millones de años' : 'hoy · 13 800 millones de años';
+  }
+  function setBang(k) { if (window.Scenes) window.Scenes.params.bangT = k; bangEpoch(k); }
   (function bangInit() {
     var s = $('#bangT'); if (!s) return;
-    s.addEventListener('input', function () { bang.touched = true; if (window.Scenes) window.Scenes.params.bangT = +s.value / 1000; });
+    s.addEventListener('input', function () { bang.touched = true; setBang(+s.value / 1000); });
     s.addEventListener('pointerdown', function () { bang.touched = true; if (bang.anim) cancelAnimationFrame(bang.anim); });
+    bangEpoch(+s.value / 1000);
   })();
   function playBang() {
     var s = $('#bangT'); if (!s || bang.touched || REDUCED) return;
-    var t0 = performance.now(), D = 7000;
-    function f(now) { var k = Math.min(1, (now - t0) / D); s.value = Math.round(k * 1000); if (window.Scenes) window.Scenes.params.bangT = k; if (k < 1) bang.anim = requestAnimationFrame(f); }
-    s.value = 0; if (window.Scenes) window.Scenes.params.bangT = 0;
+    var t0 = performance.now(), D = 9000;
+    function f(now) { var k = Math.min(1, (now - t0) / D); s.value = Math.round(k * 1000); setBang(k); if (k < 1) bang.anim = requestAnimationFrame(f); }
+    s.value = 0; setBang(0);
     bang.anim = requestAnimationFrame(f);
   }
+
+  /* 05 · botones del vaso y el océano */
+  (function oceanCtl() {
+    var b1 = $('#oceanBreak'), b2 = $('#oceanBorn'); if (!b1 || !b2) return;
+    function set(v) { var sc = window.Scenes && window.Scenes.get('ocean'); if (sc && sc.setTarget) sc.setTarget(v); b1.classList.toggle('is-on', v === 1); b2.classList.toggle('is-on', v === 0); }
+    b1.addEventListener('click', function () { set(1); }); b2.addEventListener('click', function () { set(0); });
+  })();
 
   /* =====================================================================
      04 · entropía (tinta en agua)
@@ -262,7 +275,8 @@
      ===================================================================== */
   (function waveCtl() {
     var s = $('#waveDetune'); if (!s) return;
-    var apply = function () { if (window.Scenes) window.Scenes.params.waveDetune = +s.value / 100; };
+    var read = $('#waveRead');
+    var apply = function () { var d = +s.value / 100; if (window.Scenes) window.Scenes.params.waveDetune = d; if (read) read.textContent = d < 0.06 ? 'poca · resonancia' : d < 0.45 ? 'mediana · fricción y acuerdos' : 'mucha · cancelación'; };
     s.addEventListener('input', apply); apply();
   })();
 
@@ -367,5 +381,6 @@
   var first = location.hash.replace('#', '');
   go(document.getElementById(first) && first ? first : 'inicio', { noHash: !first, noScroll: true, force: true });
   requestAnimationFrame(function () { window.scrollTo(0, 0); });
+  window.addEventListener('load', function () { window.scrollTo(0, 0); setTimeout(function () { window.scrollTo(0, 0); }, 80); });
   ticker.id = requestAnimationFrame(tick);
 })();
